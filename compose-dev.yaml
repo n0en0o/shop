@@ -13,7 +13,7 @@ services:
     ports:
       - "9101:5432"
     volumes:
-      - postrgres_catalog_dev:/var/lib/postgresql
+      - postrgres_catalog_dev:/var/lib/postgresql/data
     networks:
       - catalog_dev_net
     healthcheck:
