@@ -20,7 +20,6 @@ CREATE TABLE catalog_items (
 );
 
 
-#магия монтажа
 INSERT INTO brands (id, title) VALUES
     ('11111111-1111-1111-1111-111111111111', 'Apple'),
     ('22222222-2222-2222-2222-222222222222', 'Samsung'),
@@ -45,7 +44,16 @@ INSERT INTO categories (id, title) VALUES
     ('15151515-1515-1515-1515-151515151515', 'Cameras'),
     ('16161616-1616-1616-1616-161616161616', 'Speakers');
 
-INSERT INTO catalog_items (id, title, short_description, full_description, image_url, brand_id, category_id, price) VALUES
+INSERT INTO catalog_items (
+    id, 
+    title, 
+    short_description, 
+    full_description, 
+    image_url, 
+    brand_id, 
+    category_id, 
+    price) 
+VALUES
     ('17171717-1717-1717-1717-171717171717', 'iPhone 15', 'Apple smartphone', 'Apple iPhone 15 with OLED display and fast performance.', 'https://example.com/images/iphone-15.jpg', '11111111-1111-1111-1111-111111111111', 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 799.99),
     ('18181818-1818-1818-1818-181818181818', 'Galaxy S24', 'Samsung smartphone', 'Samsung Galaxy S24 with high refresh rate display.', 'https://example.com/images/galaxy-s24.jpg', '22222222-2222-2222-2222-222222222222', 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 749.99),
     ('19191919-1919-1919-1919-191919191919', 'Sony WH-1000XM5', 'Noise cancelling headphones', 'Wireless Sony headphones with active noise cancellation.', 'https://example.com/images/sony-wh-1000xm5.jpg', '33333333-3333-3333-3333-333333333333', 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee', 349.99),

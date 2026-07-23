@@ -1,5 +1,6 @@
 #docker compose -p marketplace-dev -f compose-dev.yaml up -d
 #docker compose -p marketplace-dev -f compose-dev.yaml down -v
+#go run -tags postgres github.com/golang-migrate/migrate/v4/cmd/migrate@latest -verbose -path ./migrations/catalog -database "postgres://postgres:123456789@localhost:9101/catalog_db_dev?sslmode=disable" up
 
 services:
   catalog_db_dev:
