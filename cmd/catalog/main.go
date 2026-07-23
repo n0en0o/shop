@@ -3,8 +3,10 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"log"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/n0en0o/marketplace/internal/catalog/api"
@@ -14,16 +16,17 @@ import (
 )
 
 func main() {
+	if err := godotenv.Load(); err != nil {
+		log.Fatal("Error loading .env file")
+	}
 
-	const (
-		appPort = "9001"
-		pgHost  = "localhost"
-		pgPort  = "9101"
-		pgDB    = "catalog_db_dev"
-		pgUser  = "postgres"
-		pgPass  = "123456789"
-		pgSSL   = "disable"
-	)
+	appPort := os.Getenv("CATALOG_APP_PORT")
+	pgHost := os.Getenv("CATALOG_PG_HOST")
+	pgPort := os.Getenv("CATALOG_PG_PORT")
+	pgDB := os.Getenv("CATALOG_PG_DATABASE")
+	pgUser := os.Getenv("CATALOG_PG_USER")
+	pgPass := os.Getenv("CATALOG_PG_PASSWORD")
+	pgSSL := os.Getenv("CATALOG_PG_SSLMODE")
 
 	dsn := fmt.Sprintf("host=%s port=%s dbname=%s user=%s password=%s sslmode=%s",
 		pgHost, pgPort, pgDB, pgUser, pgPass, pgSSL)
