@@ -43,12 +43,15 @@ func main() {
 
 	brandRepo := persistence.NewBrandRepository(db)
 	categoryRepo := persistence.NewCategoryRepository(db)
+	itemRepo := persistence.NewItemRepository(db)
 
 	listBrandsHandler := queries.NewBrandsHandler(brandRepo)
 	listCategoriesHandler := queries.NewCategoriesHandler(categoryRepo)
+	listCatalogItemsHandler := queries.NewCatalogItemsHandler(itemRepo)
 
 	brandsHandler := handlers.NewBrandsHandler(listBrandsHandler)
 	categoriesHandler := handlers.NewCategoriesHandler(listCategoriesHandler)
+	catalogItemsHandler := handlers.NewCatalogItemsHandler(listCatalogItemsHandler)
 
 	r := gin.Default()
 
@@ -56,7 +59,12 @@ func main() {
 		ctx.JSON(200, gin.H{"status": "ok"})
 	})
 
-	api.RegisterRoutes(r, brandsHandler, categoriesHandler)
+	api.RegisterRoutes(
+		r,
+		brandsHandler,
+		categoriesHandler,
+		catalogItemsHandler,
+	)
 
 	if err := r.Run(":" + appPort); err != nil {
 		log.Fatal(err)

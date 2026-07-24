@@ -8,18 +8,7 @@ import (
 	"github.com/n0en0o/marketplace/internal/catalog/domain/entities"
 )
 
-type itemRepository struct {
-	db *sql.DB
-}
-
-func NewItemRepository(db *sql.DB) *itemRepository {
-	return &itemRepository{
-		db: db,
-	}
-}
-
-func (r *itemRepository) Items(ctx context.Context) ([]entities.CatalogItem, error) {
-	query := `
+const sqlCatalogItemsQuery = `
 		SELECT ci.id,
 			ci.title,
 			ci.short_description,
@@ -33,6 +22,19 @@ func (r *itemRepository) Items(ctx context.Context) ([]entities.CatalogItem, err
 		FROM catalog_items ci
 		LEFT JOIN brands b ON ci.brand_id = b.id
 		LEFT JOIN categories c ON ci.category_id = c.id`
+
+type itemRepository struct {
+	db *sql.DB
+}
+
+func NewItemRepository(db *sql.DB) *itemRepository {
+	return &itemRepository{
+		db: db,
+	}
+}
+
+func (r *itemRepository) Items(ctx context.Context) ([]entities.CatalogItem, error) {
+	query := sqlCatalogItemsQuery
 
 	rows, err := r.db.QueryContext(ctx, query)
 	if err != nil {
@@ -48,7 +50,7 @@ func (r *itemRepository) Items(ctx context.Context) ([]entities.CatalogItem, err
 			return nil, err
 		}
 
-		items = append(items, item)
+		items = append(items, *item)
 	}
 
 	if err := rows.Err(); err != nil {
@@ -58,17 +60,21 @@ func (r *itemRepository) Items(ctx context.Context) ([]entities.CatalogItem, err
 	return items, nil
 }
 
-func ScanCatalogItem(rows *sql.Rows) (entities.CatalogItem, error) {
-	var item entities.CatalogItem
-	var shortDescription sql.NullString
-	var fullDescription sql.NullString
-	var imageURL sql.NullString
-	var brandID uuid.NullUUID
-	var brandTitle sql.NullString
-	var categoryID uuid.NullUUID
-	var categoryTitle sql.NullString
+type scanner interface {
+	Scan(dest ...any) error
+}
 
-	if err := rows.Scan(
+func ScanCatalogItem(s scanner) (*entities.CatalogItem, error) {
+	var item *entities.CatalogItem = &entities.CatalogItem{}
+	var shortDescription *sql.NullString
+	var fullDescription *sql.NullString
+	var imageURL *sql.NullString
+	var brandID *uuid.NullUUID
+	var brandTitle *sql.NullString
+	var categoryID *uuid.NullUUID
+	var categoryTitle *sql.NullString
+
+	if err := s.Scan(
 		&item.ID,
 		&item.Title,
 		&shortDescription,
@@ -80,7 +86,7 @@ func ScanCatalogItem(rows *sql.Rows) (entities.CatalogItem, error) {
 		&categoryID,
 		&categoryTitle,
 	); err != nil {
-		return entities.CatalogItem{}, err
+		return &entities.CatalogItem{}, err
 	}
 
 	item.ShortDescription = shortDescription.String
