@@ -60,6 +60,22 @@ func (r *itemRepository) Items(ctx context.Context) ([]entities.CatalogItem, err
 	return items, nil
 }
 
+func (r *itemRepository) Item(ctx context.Context, id uuid.UUID) (*entities.CatalogItem, error) {
+	query := sqlCatalogItemsQuery + " WHERE ci.id = $1"
+
+	row := r.db.QueryRowContext(ctx, query, id)
+
+	item, err := ScanCatalogItem(row)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return item, nil
+}
+
 type scanner interface {
 	Scan(dest ...any) error
 }
