@@ -49,12 +49,14 @@ func main() {
 	listCategoriesHandler := queries.NewCategoriesHandler(categoryRepo)
 	listCatalogItemsHandler := queries.NewCatalogItemsHandler(itemRepo)
 	itemByIdHandler := queries.NewCatalogItemByIdHandler(itemRepo)
+	itemsByTitleHandler := queries.NewCatalogItemsByTitleHandler(itemRepo)
 
 	brandsHandler := handlers.NewBrandsHandler(listBrandsHandler)
 	categoriesHandler := handlers.NewCategoriesHandler(listCategoriesHandler)
 	catalogItemsHandler := handlers.NewCatalogItemsHandler(
 		listCatalogItemsHandler,
 		itemByIdHandler,
+		itemsByTitleHandler,
 	)
 
 	r := gin.Default()

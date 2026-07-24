@@ -76,6 +76,34 @@ func (r *itemRepository) Item(ctx context.Context, id uuid.UUID) (*entities.Cata
 	return item, nil
 }
 
+func (r *itemRepository) ItemsByTitle(ctx context.Context, title string) ([]entities.CatalogItem, error) {
+	query := sqlCatalogItemsQuery + " WHERE ci.title ILIKE '%' || $1 || '%'"
+
+	rows, err := r.db.QueryContext(ctx, query, title)
+
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var items []entities.CatalogItem
+
+	for rows.Next() {
+		item, err := ScanCatalogItem(rows)
+		if err != nil {
+			return nil, err
+		}
+
+		items = append(items, *item)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return items, nil
+}
+
 type scanner interface {
 	Scan(dest ...any) error
 }

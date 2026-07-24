@@ -7,17 +7,20 @@ import (
 )
 
 type CatalogItemsHandler struct {
-	catalogItems    *queries.CatalogItemsHandler
-	catalogItemById *queries.CatalogItemByIdHandler
+	catalogItems        *queries.CatalogItemsHandler
+	catalogItemById     *queries.CatalogItemByIdHandler
+	catalogItemsByTitle *queries.CatalogItemsByTitleHandler
 }
 
 func NewCatalogItemsHandler(
 	catalogItems *queries.CatalogItemsHandler,
 	catalogItemById *queries.CatalogItemByIdHandler,
+	catalogItemsByTitle *queries.CatalogItemsByTitleHandler,
 ) *CatalogItemsHandler {
 	return &CatalogItemsHandler{
-		catalogItems:    catalogItems,
-		catalogItemById: catalogItemById,
+		catalogItems:        catalogItems,
+		catalogItemById:     catalogItemById,
+		catalogItemsByTitle: catalogItemsByTitle,
 	}
 }
 
@@ -50,4 +53,21 @@ func (h *CatalogItemsHandler) CatalogItemById(c *gin.Context) {
 	}
 
 	c.JSON(200, gin.H{"catalog item": item})
+}
+
+func (h *CatalogItemsHandler) CatalogItemsByTitle(c *gin.Context) {
+	title := c.Param("title")
+
+	items, err := h.catalogItemsByTitle.Handle(c.Request.Context(), title)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	if items == nil {
+		c.JSON(404, gin.H{"error": "there is no catalog item with this title"})
+		return
+	}
+
+	c.JSON(200, gin.H{"founded catalog items": items})
 }
