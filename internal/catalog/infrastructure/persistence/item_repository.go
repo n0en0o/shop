@@ -104,6 +104,58 @@ func (r *itemRepository) ItemsByTitle(ctx context.Context, title string) ([]enti
 	return items, nil
 }
 
+func (r *itemRepository) Create(
+	ctx context.Context, item entities.CatalogItem,
+) (entities.CatalogItem, error) {
+
+	if item.ID == uuid.Nil {
+		item.ID = uuid.New()
+	}
+
+	var brandID, categoryID *uuid.UUID
+
+	if item.Brand != nil {
+		brandID = &item.Brand.ID
+	}
+
+	if item.Category != nil {
+		categoryID = &item.Category.ID
+	}
+
+	sqlCreateQuery := `
+		INSERT INTO catalog_items (
+			id, 
+			title, 
+			short_description, 
+			full_description, 
+			image_url,
+			price, 
+			brand_id, 
+			category_id
+		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+	`
+
+	_, err := r.db.ExecContext(
+		ctx,
+		sqlCreateQuery,
+		item.ID,
+		item.Title,
+		item.ShortDescription,
+		item.FullDescription,
+		item.ImageURL,
+		item.Price,
+		brandID,
+		categoryID,
+	)
+
+	if err != nil {
+		return entities.CatalogItem{}, err
+	}
+
+	return item, nil
+
+}
+
 type scanner interface {
 	Scan(dest ...any) error
 }

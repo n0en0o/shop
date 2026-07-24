@@ -3,14 +3,16 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"github.com/joho/godotenv"
-	_ "github.com/lib/pq"
 	"log"
 	"os"
+
+	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
 
 	"github.com/gin-gonic/gin"
 	"github.com/n0en0o/marketplace/internal/catalog/api"
 	"github.com/n0en0o/marketplace/internal/catalog/api/handlers"
+	"github.com/n0en0o/marketplace/internal/catalog/applications/commands"
 	"github.com/n0en0o/marketplace/internal/catalog/applications/queries"
 	"github.com/n0en0o/marketplace/internal/catalog/infrastructure/persistence"
 )
@@ -50,6 +52,7 @@ func main() {
 	listCatalogItemsHandler := queries.NewCatalogItemsHandler(itemRepo)
 	itemByIdHandler := queries.NewCatalogItemByIdHandler(itemRepo)
 	itemsByTitleHandler := queries.NewCatalogItemsByTitleHandler(itemRepo)
+	createCatalogItemHandler := commands.NewCreateCatalogItemHandler(itemRepo)
 
 	brandsHandler := handlers.NewBrandsHandler(listBrandsHandler)
 	categoriesHandler := handlers.NewCategoriesHandler(listCategoriesHandler)
@@ -57,6 +60,7 @@ func main() {
 		listCatalogItemsHandler,
 		itemByIdHandler,
 		itemsByTitleHandler,
+		createCatalogItemHandler,
 	)
 
 	r := gin.Default()
