@@ -19,7 +19,8 @@ func RegisterRoutes(
 	v1.GET("/catalog-items/:id", items.CatalogItemById)              // http://localhost:9001/api/v1/catalog-items/:id
 	v1.GET("/catalog-items/title/:title", items.CatalogItemsByTitle) // http://localhost:9001/api/v1/catalog-items/title/:title
 
-	v1.POST("/catalog-items", items.CreateCatalogItem)       // http://localhost:9001/api/v1/catalog-items
-	v1.PUT("/catalog-items/:id", items.UpdateCatalogItem)    // http://localhost:9001/api/v1/catalog-items/:id
-	v1.DELETE("/catalog-items/:id", items.DeleteCatalogItem) // http://localhost:9001/api/v1/catalog-items/:id
+	v1.POST("/catalog-items", items.CreateCatalogItem)                     // http://localhost:9001/api/v1/catalog-items
+	v1.PUT("/catalog-items/:id", items.UpdateCatalogItem)                  // http://localhost:9001/api/v1/catalog-items/:id
+	v1.DELETE("/catalog-items/:id", items.DeleteCatalogItem)               // http://localhost:9001/api/v1/catalog-items/:id
+	v1.GET("/catalog-items/brand/:brand_title", items.CatalogItemsByBrand) // http://localhost:9001/api/v1/catalog-items/brand/:brand_title
 }

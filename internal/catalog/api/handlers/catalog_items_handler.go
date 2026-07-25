@@ -11,6 +11,7 @@ type CatalogItemsHandler struct {
 	catalogItems        *queries.CatalogItemsHandler
 	catalogItemById     *queries.CatalogItemByIdHandler
 	catalogItemsByTitle *queries.CatalogItemsByTitleHandler
+	catalogItemsByBrand *queries.CatalogItemsByBrandHandler
 
 	createCatalogItem *commands.CreateCatalogItemHandler
 	updateCatalogItem *commands.UpdateCatalogItemHandler
@@ -21,6 +22,7 @@ func NewCatalogItemsHandler(
 	catalogItems *queries.CatalogItemsHandler,
 	catalogItemById *queries.CatalogItemByIdHandler,
 	catalogItemsByTitle *queries.CatalogItemsByTitleHandler,
+	catalogItemsByBrand *queries.CatalogItemsByBrandHandler,
 
 	createCatalogItem *commands.CreateCatalogItemHandler,
 	updateCatalogItem *commands.UpdateCatalogItemHandler,
@@ -30,6 +32,7 @@ func NewCatalogItemsHandler(
 		catalogItems:        catalogItems,
 		catalogItemById:     catalogItemById,
 		catalogItemsByTitle: catalogItemsByTitle,
+		catalogItemsByBrand: catalogItemsByBrand,
 
 		createCatalogItem: createCatalogItem,
 		updateCatalogItem: updateCatalogItem,
@@ -145,4 +148,22 @@ func (h *CatalogItemsHandler) DeleteCatalogItem(c *gin.Context) {
 	}
 
 	c.JSON(200, gin.H{"message": "catalog item deleted successfully"})
+}
+
+func (h *CatalogItemsHandler) CatalogItemsByBrand(c *gin.Context) {
+	brand := c.Param("brand_title")
+
+	items, err := h.catalogItemsByBrand.Handle(c.Request.Context(), brand)
+
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	if items == nil {
+		c.JSON(404, gin.H{"error": "there is no catalog item with this brand"})
+		return
+	}
+
+	c.JSON(200, gin.H{"founded catalog items": items})
 }
