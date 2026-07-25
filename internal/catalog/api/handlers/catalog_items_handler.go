@@ -13,6 +13,7 @@ type CatalogItemsHandler struct {
 	catalogItemsByTitle *queries.CatalogItemsByTitleHandler
 
 	createCatalogItem *commands.CreateCatalogItemHandler
+	updateCatalogItem *commands.UpdateCatalogItemHandler
 }
 
 func NewCatalogItemsHandler(
@@ -21,6 +22,7 @@ func NewCatalogItemsHandler(
 	catalogItemsByTitle *queries.CatalogItemsByTitleHandler,
 
 	createCatalogItem *commands.CreateCatalogItemHandler,
+	updateCatalogItem *commands.UpdateCatalogItemHandler,
 ) *CatalogItemsHandler {
 	return &CatalogItemsHandler{
 		catalogItems:        catalogItems,
@@ -28,6 +30,7 @@ func NewCatalogItemsHandler(
 		catalogItemsByTitle: catalogItemsByTitle,
 
 		createCatalogItem: createCatalogItem,
+		updateCatalogItem: updateCatalogItem,
 	}
 }
 
@@ -94,4 +97,26 @@ func (h *CatalogItemsHandler) CreateCatalogItem(c *gin.Context) {
 
 	c.JSON(201, gin.H{"created catalog item ID": id})
 
+}
+
+func (h *CatalogItemsHandler) UpdateCatalogItem(c *gin.Context) {
+	var cmd commands.UpdateCatalogItemCommand
+
+	if err := c.ShouldBindJSON(&cmd); err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	success, err := h.updateCatalogItem.Handle(c.Request.Context(), cmd)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	if !success {
+		c.JSON(404, gin.H{"error": "catalog item not found"})
+		return
+	}
+
+	c.JSON(200, gin.H{"message": "catalog item updated successfully"})
 }

@@ -156,6 +156,58 @@ func (r *itemRepository) Create(
 
 }
 
+func (r *itemRepository) Update(
+	ctx context.Context, item entities.CatalogItem,
+) (bool, error) {
+
+	var brandID, categoryID *uuid.UUID
+
+	if item.Brand != nil {
+		brandID = &item.Brand.ID
+	}
+
+	if item.Category != nil {
+		categoryID = &item.Category.ID
+	}
+
+	sqlUpdateQuery := `
+		UPDATE catalog_items
+		SET title = $1,
+			short_description = $2,
+			full_description = $3,
+			image_url = $4,
+			price = $5,
+			brand_id = $6,
+			category_id = $7
+		WHERE id = $8
+	`
+
+	result, err := r.db.ExecContext(
+		ctx,
+		sqlUpdateQuery,
+		item.Title,
+		item.ShortDescription,
+		item.FullDescription,
+		item.ImageURL,
+		item.Price,
+		brandID,
+		categoryID,
+		item.ID,
+	)
+
+	if err != nil {
+		return false, err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+
+	if err != nil {
+		return false, err
+	}
+
+	return rowsAffected > 0, nil
+}
+
 type scanner interface {
 	Scan(dest ...any) error
 }
