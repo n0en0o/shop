@@ -208,6 +208,30 @@ func (r *itemRepository) Update(
 	return rowsAffected > 0, nil
 }
 
+func (r *itemRepository) Delete(
+	ctx context.Context, id uuid.UUID,
+) (bool, error) {
+
+	sqlDeleteQuery := `
+		DELETE FROM catalog_items
+		WHERE id = $1
+	`
+
+	result, err := r.db.ExecContext(ctx, sqlDeleteQuery, id)
+
+	if err != nil {
+		return false, err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+
+	if err != nil {
+		return false, err
+	}
+
+	return rowsAffected > 0, nil
+}
+
 type scanner interface {
 	Scan(dest ...any) error
 }

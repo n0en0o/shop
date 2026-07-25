@@ -13,6 +13,7 @@ type CatalogItemRepository interface {
 	ItemsByTitle(ctx context.Context, title string) ([]entities.CatalogItem, error)
 	Create(ctx context.Context, item entities.CatalogItem) (entities.CatalogItem, error)
 	Update(ctx context.Context, item entities.CatalogItem) (bool, error)
+	Delete(ctx context.Context, id uuid.UUID) (bool, error)
 }
 
 type BrandRepository interface {

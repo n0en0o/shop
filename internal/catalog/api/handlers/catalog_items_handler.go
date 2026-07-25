@@ -14,6 +14,7 @@ type CatalogItemsHandler struct {
 
 	createCatalogItem *commands.CreateCatalogItemHandler
 	updateCatalogItem *commands.UpdateCatalogItemHandler
+	deleteCatalogItem *commands.DeleteCatalogItemHandler
 }
 
 func NewCatalogItemsHandler(
@@ -23,6 +24,7 @@ func NewCatalogItemsHandler(
 
 	createCatalogItem *commands.CreateCatalogItemHandler,
 	updateCatalogItem *commands.UpdateCatalogItemHandler,
+	deleteCatalogItem *commands.DeleteCatalogItemHandler,
 ) *CatalogItemsHandler {
 	return &CatalogItemsHandler{
 		catalogItems:        catalogItems,
@@ -31,6 +33,7 @@ func NewCatalogItemsHandler(
 
 		createCatalogItem: createCatalogItem,
 		updateCatalogItem: updateCatalogItem,
+		deleteCatalogItem: deleteCatalogItem,
 	}
 }
 
@@ -119,4 +122,27 @@ func (h *CatalogItemsHandler) UpdateCatalogItem(c *gin.Context) {
 	}
 
 	c.JSON(200, gin.H{"message": "catalog item updated successfully"})
+}
+
+func (h *CatalogItemsHandler) DeleteCatalogItem(c *gin.Context) {
+	id, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		c.JSON(400, gin.H{"error": "invalid UUID"})
+		return
+	}
+
+	success, err := h.deleteCatalogItem.Handle(
+		c.Request.Context(), commands.DeleteCatalogItemCommand{ID: id})
+
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	if !success {
+		c.JSON(404, gin.H{"error": "catalog item not found"})
+		return
+	}
+
+	c.JSON(200, gin.H{"message": "catalog item deleted successfully"})
 }
