@@ -5,6 +5,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/n0en0o/marketplace/internal/catalog/domain/entities"
+	"github.com/n0en0o/marketplace/internal/catalog/domain/spec"
 )
 
 type CatalogItemRepository interface {
@@ -15,6 +16,9 @@ type CatalogItemRepository interface {
 	Create(ctx context.Context, item entities.CatalogItem) (entities.CatalogItem, error)
 	Update(ctx context.Context, item entities.CatalogItem) (bool, error)
 	Delete(ctx context.Context, id uuid.UUID) (bool, error)
+
+	CatalogItems(ctx context.Context, args spec.QueryArgs) (
+		spec.Pagination[entities.CatalogItem], error)
 }
 
 type BrandRepository interface {

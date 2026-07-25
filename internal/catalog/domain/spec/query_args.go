@@ -5,7 +5,7 @@ import "github.com/google/uuid"
 const MaxPageSize = 4
 
 type QueryArgs struct {
-	Page       int     `form:"page"`
+	PageIndex  int     `form:"pageIndex"`
 	PageSize   int     `form:"pageSize"`
 	BrandID    *string `form:"brandId"`
 	CategoryID *string `form:"categoryId"`
@@ -15,8 +15,8 @@ type QueryArgs struct {
 
 func (q *QueryArgs) Normalize() {
 
-	if q.Page <= 0 {
-		q.Page = 1
+	if q.PageIndex <= 0 {
+		q.PageIndex = 1
 	}
 
 	if q.PageSize <= 0 {

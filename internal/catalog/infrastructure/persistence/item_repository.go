@@ -3,9 +3,12 @@ package persistence
 import (
 	"context"
 	"database/sql"
+	"fmt"
+	"strings"
 
 	"github.com/google/uuid"
 	"github.com/n0en0o/marketplace/internal/catalog/domain/entities"
+	"github.com/n0en0o/marketplace/internal/catalog/domain/spec"
 )
 
 const sqlCatalogItemsQuery = `
@@ -138,6 +141,126 @@ func (r *itemRepository) ItemsByBrand(
 	}
 
 	return items, nil
+}
+
+func (r *itemRepository) CatalogItems(ctx context.Context, args spec.QueryArgs) (
+	spec.Pagination[entities.CatalogItem], error) {
+
+	args.Normalize()
+
+	sqlBaseFrom := `
+		FROM catalog_items ci
+		LEFT JOIN brands b ON ci.brand_id = b.id
+		LEFT JOIN categories c ON ci.category_id = c.id
+	`
+
+	var conditions []string
+	var params []any
+	paramIdx := 1
+
+	brandID, err := args.ParseBrandID()
+	if err != nil {
+		return spec.Pagination[entities.CatalogItem]{},
+			fmt.Errorf("invalid brandId: %w", err)
+	}
+
+	categoryID, err := args.ParseCategoryID()
+	if err != nil {
+		return spec.Pagination[entities.CatalogItem]{},
+			fmt.Errorf("invalid categoryId: %w", err)
+	}
+
+	if brandID != nil {
+		conditions = append(conditions, fmt.Sprintf("ci.brand_id = $%d", paramIdx))
+		params = append(params, *brandID)
+		paramIdx += 1
+	}
+
+	if categoryID != nil {
+		conditions = append(conditions, fmt.Sprintf("ci.category_id = $%d", paramIdx))
+		params = append(params, *categoryID)
+		paramIdx += 1
+	}
+
+	if args.Search != nil && *args.Search != "" {
+		conditions = append(conditions,
+			fmt.Sprintf("ci.title ILIKE '%%' || $%d || '%%'", paramIdx))
+		params = append(params, *args.Search)
+		paramIdx += 1
+	}
+
+	whereClause := ""
+	if len(conditions) > 0 {
+		whereClause = " WHERE " + strings.Join(conditions, " AND ")
+	}
+
+	countQuery := "SELECT count(*)" + sqlBaseFrom + whereClause
+
+	var totalCount int
+	err = r.db.QueryRowContext(ctx, countQuery, params...).Scan(&totalCount)
+	if err != nil {
+		return spec.Pagination[entities.CatalogItem]{}, err
+	}
+
+	orderClause := ""
+	if args.Sort != nil {
+		switch strings.ToLower(*args.Sort) {
+		case "price_asc":
+			orderClause = " ORDER BY ci.price ASC"
+		case "price_desc":
+			orderClause = " ORDER BY ci.price DESC"
+		case "title_asc":
+			orderClause = " ORDER BY ci.title ASC"
+		case "title_desc":
+			orderClause = " ORDER BY ci.title DESC"
+		}
+	}
+
+	offset := (args.PageIndex - 1) * args.PageSize
+	paginationClause := fmt.Sprintf(" LIMIT $%d OFFSET $%d", paramIdx, paramIdx+1)
+	paginationParams := append(params, args.PageSize, offset)
+
+	sqlSelectFields := `
+		SELECT ci.id,
+			ci.title,
+			ci.short_description,
+			ci.full_description,
+			ci.image_url,
+			ci.price,
+			b.id,
+			b.title,
+			c.id,
+			c.title
+	`
+
+	sqlFullQuery := sqlSelectFields + sqlBaseFrom + whereClause + orderClause + paginationClause
+
+	rows, err := r.db.QueryContext(ctx, sqlFullQuery, paginationParams...)
+	if err != nil {
+		return spec.Pagination[entities.CatalogItem]{}, err
+	}
+	defer rows.Close()
+
+	var items []entities.CatalogItem = []entities.CatalogItem{}
+
+	for rows.Next() {
+		item, err := ScanCatalogItem(rows)
+		if err != nil {
+			return spec.Pagination[entities.CatalogItem]{}, err
+		}
+		items = append(items, *item)
+	}
+
+	if err := rows.Err(); err != nil {
+		return spec.Pagination[entities.CatalogItem]{}, err
+	}
+
+	return spec.Pagination[entities.CatalogItem]{
+		PageIndex:  args.PageIndex,
+		PageSize:   args.PageSize,
+		TotalCount: totalCount,
+		Items:      items,
+	}, nil
 }
 
 func (r *itemRepository) Create(
