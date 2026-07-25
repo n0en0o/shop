@@ -6,6 +6,10 @@ import (
 	"log"
 	"os"
 
+	"github.com/golang-migrate/migrate/v4"
+	"github.com/golang-migrate/migrate/v4/database/postgres"
+
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 
@@ -29,6 +33,7 @@ func main() {
 	pgUser := os.Getenv("CATALOG_PG_USER")
 	pgPass := os.Getenv("CATALOG_PG_PASSWORD")
 	pgSSL := os.Getenv("CATALOG_PG_SSLMODE")
+	migrationsPath := os.Getenv("CATALOG_MIGRATION_PATH")
 
 	dsn := fmt.Sprintf("host=%s port=%s dbname=%s user=%s password=%s sslmode=%s",
 		pgHost, pgPort, pgDB, pgUser, pgPass, pgSSL)
@@ -40,8 +45,24 @@ func main() {
 	defer db.Close()
 
 	if err := db.Ping(); err != nil {
-		log.Fatal(err)
+		log.Fatal("can't connect to db: ", err)
 	}
+
+	log.Println("connected to db successfuly")
+	driver, err := postgres.WithInstance(db, &postgres.Config{})
+	if err != nil {
+		log.Fatal("postgres.WithInstance: ", err)
+	}
+
+	m, err := migrate.NewWithDatabaseInstance(migrationsPath, "postgres", driver)
+	if err != nil {
+		log.Fatal("migrate.NewWithDatabaseInstance: ", err)
+	}
+	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
+		log.Fatal("migrate.Up(): ", err)
+	}
+
+	log.Println("miggrations completed successfuly")
 
 	brandRepo := persistence.NewBrandRepository(db)
 	categoryRepo := persistence.NewCategoryRepository(db)
@@ -69,6 +90,9 @@ func main() {
 		deleteCatalogItemHandler,
 	)
 
+	listItemsV2 := queries.NewCatalogItemsV2Handler(itemRepo)
+	itemsHandlerV2 := handlers.NewCatalogItemsHandlerV2(listItemsV2)
+
 	r := gin.Default()
 
 	r.GET("/health", func(ctx *gin.Context) {
@@ -80,8 +104,10 @@ func main() {
 		brandsHandler,
 		categoriesHandler,
 		catalogItemsHandler,
+		itemsHandlerV2,
 	)
 
+	log.Printf("starting server on port: %s\n", appPort)
 	if err := r.Run(":" + appPort); err != nil {
 		log.Fatal(err)
 	}

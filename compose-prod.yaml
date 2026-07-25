@@ -1,0 +1,61 @@
+# docker compose -p marketplace-prod -f compose-prod.yaml down -v
+# docker-compose -p marketplace-prod -f compose-prod.yaml up -d
+# docker-compose -p marketplace-prod -f compose-prod.yaml up --build -d
+
+services:
+  catalog_db_prod:
+    container_name: "catalog-db-prod"
+    image: postgres:18.1
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=12345678
+      - POSTGRES_DB=catalog-db-prod
+    restart: always
+    ports:
+      - "9301:5432"
+    volumes:
+      - postgres_catalog_prod:/var/lib/postgresql
+    networks:
+      - marketplace-prod-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  catalog_api:
+    container_name: catalog-api
+    build:
+      context: .
+      dockerfile: cmd/catalog/DockerFile
+    ports:
+      - "9201:7001"
+    networks:
+      - marketplace-prod-net
+    environment:
+      - CATALOG_APP_PORT=7001
+      - CATALOG_PG_HOST=catalog_db_prod
+      - CATALOG_PG_PORT=5432
+      - CATALOG_PG_DATABASE=catalog-db-prod
+      - CATALOG_PG_USER=postgres
+      - CATALOG_PG_PASSWORD=12345678
+      - CATALOG_PG_SSLMODE=disable
+      - CATALOG_MIGRATION_PATH=file:///app/migrations/catalog
+    depends_on:
+      catalog_db_prod:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost:7001/health || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 30s
+
+volumes:
+  postgres_catalog_prod:
+
+networks:
+  marketplace-prod-net:
+    driver: bridge

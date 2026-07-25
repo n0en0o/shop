@@ -16,7 +16,7 @@ services:
     volumes:
       - postrgres_catalog_dev:/var/lib/postgresql/data
     networks:
-      - catalog_dev_net
+      - marketplace_dev_net
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
@@ -28,5 +28,5 @@ volumes:
   postrgres_catalog_dev:
 
 networks:
-  catalog_dev_net:
+  marketplace_dev_net:
     driver: bridge

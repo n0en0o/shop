@@ -10,6 +10,8 @@ func RegisterRoutes(
 	brands *handlers.BrandsHandler,
 	categories *handlers.CategoriesHandler,
 	items *handlers.CatalogItemsHandler,
+
+	itemsV2 *handlers.CatalogItemsHandlerV2,
 ) {
 	v1 := r.Group("/api/v1")
 
@@ -23,4 +25,9 @@ func RegisterRoutes(
 	v1.POST("/catalog-items", items.CreateCatalogItem)       // http://localhost:9001/api/v1/catalog-items
 	v1.PUT("/catalog-items/:id", items.UpdateCatalogItem)    // http://localhost:9001/api/v1/catalog-items/:id
 	v1.DELETE("/catalog-items/:id", items.DeleteCatalogItem) // http://localhost:9001/api/v1/catalog-items/:id
+
+	v2 := r.Group("/api/v2")
+
+	v2.GET("/catalog-items", itemsV2.CatalogItems) // http://localhost:9001/api/v2/catalog-items
+
 }
