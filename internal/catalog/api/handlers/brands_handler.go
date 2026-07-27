@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/n0en0o/marketplace/internal/catalog/applications/queries"
 )
@@ -18,9 +20,9 @@ func NewBrandsHandler(brands *queries.BrandsHandler) *BrandsHandler {
 func (h *BrandsHandler) Brands(c *gin.Context) {
 	brands, err := h.brands.Handle(c.Request.Context())
 	if err != nil {
-		c.JSON(500, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 
-	c.JSON(200, gin.H{"brands": brands})
+	c.JSON(http.StatusOK, gin.H{"brands": brands})
 }

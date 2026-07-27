@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/n0en0o/marketplace/internal/catalog/applications/queries"
 	"github.com/n0en0o/marketplace/internal/catalog/domain/spec"
@@ -21,7 +23,7 @@ func NewCatalogItemsHandlerV2(
 func (h *CatalogItemsHandlerV2) CatalogItems(c *gin.Context) {
 	var args spec.QueryArgs
 	if err := c.ShouldBindQuery(&args); err != nil {
-		c.JSON(400, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
 		return
@@ -29,13 +31,13 @@ func (h *CatalogItemsHandlerV2) CatalogItems(c *gin.Context) {
 
 	result, err := h.catalogItems.Handle(c.Request.Context(), args)
 	if err != nil {
-		c.JSON(500, gin.H{
-			"error": err.Error(),
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "internal server error",
 		})
 		return
 	}
 
-	c.JSON(200, gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"catalog_items": result,
 	})
 }

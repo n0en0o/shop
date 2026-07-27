@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"errors"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -46,31 +47,31 @@ func NewCatalogItemsHandler(
 func (h *CatalogItemsHandler) CatalogItems(c *gin.Context) {
 	items, err := h.catalogItems.Handle(c.Request.Context())
 	if err != nil {
-		c.JSON(500, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 
-	c.JSON(200, gin.H{"catalog_items": items})
+	c.JSON(http.StatusOK, gin.H{"catalog_items": items})
 }
 
 func (h *CatalogItemsHandler) CatalogItemById(c *gin.Context) {
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		c.JSON(400, gin.H{"error": "invalid UUID"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid UUID"})
 		return
 	}
 
 	item, err := h.catalogItemById.Handle(c.Request.Context(), id)
 	if errors.Is(err, repositories.ErrItemNotFound) {
-		c.JSON(404, gin.H{"error": "catalog item not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "catalog item not found"})
 		return
 	}
 	if err != nil {
-		c.JSON(500, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 
-	c.JSON(200, gin.H{"catalog_item": item})
+	c.JSON(http.StatusOK, gin.H{"catalog_item": item})
 }
 
 func (h *CatalogItemsHandler) CatalogItemsByTitle(c *gin.Context) {
@@ -78,46 +79,46 @@ func (h *CatalogItemsHandler) CatalogItemsByTitle(c *gin.Context) {
 
 	items, err := h.catalogItemsByTitle.Handle(c.Request.Context(), title)
 	if err != nil {
-		c.JSON(500, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 
 	if items == nil {
-		c.JSON(404, gin.H{"error": "there is no catalog item with this title"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "there is no catalog item with this title"})
 		return
 	}
 
-	c.JSON(200, gin.H{"catalog_items": items})
+	c.JSON(http.StatusOK, gin.H{"catalog_items": items})
 }
 
 func (h *CatalogItemsHandler) CreateCatalogItem(c *gin.Context) {
 	var cmd commands.CreateCatalogItemCommand
 	if err := c.ShouldBindJSON(&cmd); err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	id, err := h.createCatalogItem.Handle(c.Request.Context(), cmd)
 	if err != nil {
-		c.JSON(500, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 
-	c.JSON(201, gin.H{"created_catalog_item_id": id})
+	c.JSON(http.StatusCreated, gin.H{"created_catalog_item_id": id})
 
 }
 
 func (h *CatalogItemsHandler) UpdateCatalogItem(c *gin.Context) {
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		c.JSON(400, gin.H{"error": "invalid UUID"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid UUID"})
 		return
 	}
 
 	var cmd commands.UpdateCatalogItemCommand
 
 	if err := c.ShouldBindJSON(&cmd); err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -125,22 +126,22 @@ func (h *CatalogItemsHandler) UpdateCatalogItem(c *gin.Context) {
 
 	success, err := h.updateCatalogItem.Handle(c.Request.Context(), cmd)
 	if err != nil {
-		c.JSON(500, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 
 	if !success {
-		c.JSON(404, gin.H{"error": "catalog item not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "catalog item not found"})
 		return
 	}
 
-	c.JSON(200, gin.H{"message": "catalog item updated successfully"})
+	c.JSON(http.StatusOK, gin.H{"message": "catalog item updated successfully"})
 }
 
 func (h *CatalogItemsHandler) DeleteCatalogItem(c *gin.Context) {
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		c.JSON(400, gin.H{"error": "invalid UUID"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid UUID"})
 		return
 	}
 
@@ -148,16 +149,16 @@ func (h *CatalogItemsHandler) DeleteCatalogItem(c *gin.Context) {
 		c.Request.Context(), commands.DeleteCatalogItemCommand{ID: id})
 
 	if err != nil {
-		c.JSON(500, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 
 	if !success {
-		c.JSON(404, gin.H{"error": "catalog item not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "catalog item not found"})
 		return
 	}
 
-	c.JSON(200, gin.H{"message": "catalog item deleted successfully"})
+	c.JSON(http.StatusOK, gin.H{"message": "catalog item deleted successfully"})
 }
 
 func (h *CatalogItemsHandler) CatalogItemsByBrand(c *gin.Context) {
@@ -166,14 +167,14 @@ func (h *CatalogItemsHandler) CatalogItemsByBrand(c *gin.Context) {
 	items, err := h.catalogItemsByBrand.Handle(c.Request.Context(), brand)
 
 	if err != nil {
-		c.JSON(500, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 
 	if items == nil {
-		c.JSON(404, gin.H{"error": "there is no catalog item with this brand"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "there is no catalog item with this brand"})
 		return
 	}
 
-	c.JSON(200, gin.H{"catalog_items": items})
+	c.JSON(http.StatusOK, gin.H{"catalog_items": items})
 }

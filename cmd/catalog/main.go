@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 
 	"github.com/golang-migrate/migrate/v4"
@@ -97,7 +98,7 @@ func main() {
 	r := gin.Default()
 
 	r.GET("/health", func(ctx *gin.Context) {
-		ctx.JSON(200, gin.H{"status": "ok"})
+		ctx.JSON(http.StatusOK, gin.H{"status": "ok"})
 	})
 
 	api.RegisterRoutes(
