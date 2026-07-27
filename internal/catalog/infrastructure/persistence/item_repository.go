@@ -43,28 +43,7 @@ func (r *itemRepository) Items(
 ) ([]entities.CatalogItem, error) {
 	query := sqlCatalogItemsQuery
 
-	rows, err := r.db.QueryContext(ctx, query)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	var items []entities.CatalogItem
-
-	for rows.Next() {
-		item, err := ScanCatalogItem(rows)
-		if err != nil {
-			return nil, err
-		}
-
-		items = append(items, *item)
-	}
-
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-
-	return items, nil
+	return r.queryItems(ctx, query)
 }
 
 func (r *itemRepository) Item(
@@ -90,29 +69,7 @@ func (r *itemRepository) ItemsByTitle(
 ) ([]entities.CatalogItem, error) {
 	query := sqlCatalogItemsQuery + " WHERE ci.title ILIKE '%' || $1 || '%'"
 
-	rows, err := r.db.QueryContext(ctx, query, title)
-
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	var items []entities.CatalogItem
-
-	for rows.Next() {
-		item, err := ScanCatalogItem(rows)
-		if err != nil {
-			return nil, err
-		}
-
-		items = append(items, *item)
-	}
-
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-
-	return items, nil
+	return r.queryItems(ctx, query, title)
 }
 
 func (r *itemRepository) ItemsByBrand(
@@ -120,8 +77,13 @@ func (r *itemRepository) ItemsByBrand(
 ) ([]entities.CatalogItem, error) {
 	query := sqlCatalogItemsQuery + " WHERE b.title ILIKE '%' || $1 || '%'"
 
-	rows, err := r.db.QueryContext(ctx, query, brand)
+	return r.queryItems(ctx, query, brand)
+}
 
+func (r *itemRepository) queryItems(
+	ctx context.Context, query string, args ...any,
+) ([]entities.CatalogItem, error) {
+	rows, err := r.db.QueryContext(ctx, query, args...)
 	if err != nil {
 		return nil, err
 	}
