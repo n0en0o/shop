@@ -38,6 +38,6 @@ func (h *CatalogItemsHandlerV2) CatalogItems(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"catalog_items": result,
+		"items": result,
 	})
 }

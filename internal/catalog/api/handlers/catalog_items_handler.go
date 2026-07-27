@@ -51,7 +51,7 @@ func (h *CatalogItemsHandler) CatalogItems(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"catalog_items": items})
+	c.JSON(http.StatusOK, gin.H{"items": items})
 }
 
 func (h *CatalogItemsHandler) CatalogItemById(c *gin.Context) {
@@ -71,7 +71,7 @@ func (h *CatalogItemsHandler) CatalogItemById(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"catalog_item": item})
+	c.JSON(http.StatusOK, gin.H{"item": item})
 }
 
 func (h *CatalogItemsHandler) CatalogItemsByTitle(c *gin.Context) {
@@ -88,7 +88,7 @@ func (h *CatalogItemsHandler) CatalogItemsByTitle(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"catalog_items": items})
+	c.JSON(http.StatusOK, gin.H{"items": items})
 }
 
 func (h *CatalogItemsHandler) CreateCatalogItem(c *gin.Context) {
@@ -176,5 +176,5 @@ func (h *CatalogItemsHandler) CatalogItemsByBrand(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"catalog_items": items})
+	c.JSON(http.StatusOK, gin.H{"items": items})
 }
