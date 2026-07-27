@@ -397,13 +397,13 @@ type scanner interface {
 
 func ScanCatalogItem(s scanner) (*entities.CatalogItem, error) {
 	var item *entities.CatalogItem = &entities.CatalogItem{}
-	var shortDescription *sql.NullString
-	var fullDescription *sql.NullString
-	var imageURL *sql.NullString
-	var brandID *uuid.NullUUID
-	var brandTitle *sql.NullString
-	var categoryID *uuid.NullUUID
-	var categoryTitle *sql.NullString
+	var shortDescription sql.NullString
+	var fullDescription sql.NullString
+	var imageURL sql.NullString
+	var brandID uuid.NullUUID
+	var brandTitle sql.NullString
+	var categoryID uuid.NullUUID
+	var categoryTitle sql.NullString
 
 	if err := s.Scan(
 		&item.ID,
