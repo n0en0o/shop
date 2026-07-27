@@ -3,16 +3,13 @@ package main
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 
 	_ "github.com/golang-migrate/migrate/v4/source/file"
-	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 
 	"github.com/gin-gonic/gin"
@@ -20,27 +17,17 @@ import (
 	"github.com/n0en0o/marketplace/internal/catalog/api/handlers"
 	"github.com/n0en0o/marketplace/internal/catalog/applications/commands"
 	"github.com/n0en0o/marketplace/internal/catalog/applications/queries"
+	"github.com/n0en0o/marketplace/internal/catalog/config"
 	"github.com/n0en0o/marketplace/internal/catalog/infrastructure/persistence"
 )
 
 func main() {
-	if err := godotenv.Load(); err != nil {
-		log.Println("No .env file found, using environment variables")
+	cfg, err := config.Load()
+	if err != nil {
+		log.Fatal("invalid config: ", err)
 	}
 
-	appPort := os.Getenv("CATALOG_APP_PORT")
-	pgHost := os.Getenv("CATALOG_PG_HOST")
-	pgPort := os.Getenv("CATALOG_PG_PORT")
-	pgDB := os.Getenv("CATALOG_PG_DATABASE")
-	pgUser := os.Getenv("CATALOG_PG_USER")
-	pgPass := os.Getenv("CATALOG_PG_PASSWORD")
-	pgSSL := os.Getenv("CATALOG_PG_SSLMODE")
-	migrationsPath := os.Getenv("CATALOG_MIGRATION_PATH")
-
-	dsn := fmt.Sprintf("host=%s port=%s dbname=%s user=%s password=%s sslmode=%s",
-		pgHost, pgPort, pgDB, pgUser, pgPass, pgSSL)
-
-	db, err := sql.Open("postgres", dsn)
+	db, err := sql.Open("postgres", cfg.DatabaseDSN())
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -56,7 +43,7 @@ func main() {
 		log.Fatal("postgres.WithInstance: ", err)
 	}
 
-	m, err := migrate.NewWithDatabaseInstance(migrationsPath, "postgres", driver)
+	m, err := migrate.NewWithDatabaseInstance(cfg.MigrationsPath, "postgres", driver)
 	if err != nil {
 		log.Fatal("migrate.NewWithDatabaseInstance: ", err)
 	}
@@ -109,8 +96,8 @@ func main() {
 		itemsHandlerV2,
 	)
 
-	log.Printf("starting server on port: %s\n", appPort)
-	if err := r.Run(":" + appPort); err != nil {
+	log.Printf("starting server on port: %s\n", cfg.AppPort)
+	if err := r.Run(":" + cfg.AppPort); err != nil {
 		log.Fatal(err)
 	}
 }
