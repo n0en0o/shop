@@ -32,7 +32,7 @@ type itemRepository struct {
 	db *sql.DB
 }
 
-func NewItemRepository(db *sql.DB) *itemRepository {
+func NewItemRepository(db *sql.DB) repositories.CatalogItemRepository {
 	return &itemRepository{
 		db: db,
 	}
