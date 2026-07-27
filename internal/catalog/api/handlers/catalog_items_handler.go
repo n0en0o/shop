@@ -106,12 +106,20 @@ func (h *CatalogItemsHandler) CreateCatalogItem(c *gin.Context) {
 }
 
 func (h *CatalogItemsHandler) UpdateCatalogItem(c *gin.Context) {
+	id, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		c.JSON(400, gin.H{"error": "invalid UUID"})
+		return
+	}
+
 	var cmd commands.UpdateCatalogItemCommand
 
 	if err := c.ShouldBindJSON(&cmd); err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
+
+	cmd.ID = id
 
 	success, err := h.updateCatalogItem.Handle(c.Request.Context(), cmd)
 	if err != nil {
