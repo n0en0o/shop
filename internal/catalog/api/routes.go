@@ -18,7 +18,7 @@ func RegisterRoutes(
 	v1.GET("/brands", brands.Brands)                                       // http://localhost:9001/api/v1/brands
 	v1.GET("/categories", categories.Categories)                           // http://localhost:9001/api/v1/categories
 	v1.GET("/catalog-items", items.CatalogItems)                           // http://localhost:9001/api/v1/catalog-items
-	v1.GET("/catalog-items/:id", items.CatalogItemById)                    // http://localhost:9001/api/v1/catalog-items/:id
+	v1.GET("/catalog-items/:id", items.CatalogItemByID)                    // http://localhost:9001/api/v1/catalog-items/:id
 	v1.GET("/catalog-items/title/:title", items.CatalogItemsByTitle)       // http://localhost:9001/api/v1/catalog-items/title/:title
 	v1.GET("/catalog-items/brand/:brand_title", items.CatalogItemsByBrand) // http://localhost:9001/api/v1/catalog-items/brand/:brand_title
 

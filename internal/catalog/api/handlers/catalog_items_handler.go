@@ -13,7 +13,7 @@ import (
 
 type CatalogItemsHandler struct {
 	catalogItems        *queries.CatalogItemsHandler
-	catalogItemById     *queries.CatalogItemByIdHandler
+	catalogItemByID     *queries.CatalogItemByIDHandler
 	catalogItemsByTitle *queries.CatalogItemsByTitleHandler
 	catalogItemsByBrand *queries.CatalogItemsByBrandHandler
 
@@ -24,7 +24,7 @@ type CatalogItemsHandler struct {
 
 func NewCatalogItemsHandler(
 	catalogItems *queries.CatalogItemsHandler,
-	catalogItemById *queries.CatalogItemByIdHandler,
+	catalogItemByID *queries.CatalogItemByIDHandler,
 	catalogItemsByTitle *queries.CatalogItemsByTitleHandler,
 	catalogItemsByBrand *queries.CatalogItemsByBrandHandler,
 
@@ -34,7 +34,7 @@ func NewCatalogItemsHandler(
 ) *CatalogItemsHandler {
 	return &CatalogItemsHandler{
 		catalogItems:        catalogItems,
-		catalogItemById:     catalogItemById,
+		catalogItemByID:     catalogItemByID,
 		catalogItemsByTitle: catalogItemsByTitle,
 		catalogItemsByBrand: catalogItemsByBrand,
 
@@ -54,14 +54,14 @@ func (h *CatalogItemsHandler) CatalogItems(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"items": items})
 }
 
-func (h *CatalogItemsHandler) CatalogItemById(c *gin.Context) {
+func (h *CatalogItemsHandler) CatalogItemByID(c *gin.Context) {
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid UUID"})
 		return
 	}
 
-	item, err := h.catalogItemById.Handle(c.Request.Context(), id)
+	item, err := h.catalogItemByID.Handle(c.Request.Context(), id)
 	if errors.Is(err, repositories.ErrItemNotFound) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "catalog item not found"})
 		return

@@ -10,14 +10,14 @@ import (
 )
 
 type UpdateCatalogItemCommand struct {
-	ID               uuid.UUID          `json:"id"`
-	Title            string             `json:"title"`
-	ShortDescription string             `json:"short_description"`
-	FullDescription  string             `json:"full_description"`
-	ImageURL         string             `json:"image_url"`
-	Price            float64            `json:"price"`
-	BrandID          *entities.Brand    `json:"brand"`
-	CategoryID       *entities.Category `json:"category"`
+	ID               uuid.UUID  `json:"id"`
+	Title            string     `json:"title"`
+	ShortDescription string     `json:"short_description"`
+	FullDescription  string     `json:"full_description"`
+	ImageURL         string     `json:"image_url"`
+	Price            float64    `json:"price"`
+	BrandID          *uuid.UUID `json:"brand_id"`
+	CategoryID       *uuid.UUID `json:"category_id"`
 }
 
 type UpdateCatalogItemHandler struct {
@@ -43,6 +43,24 @@ func (h *UpdateCatalogItemHandler) Handle(
 		return false, err
 	}
 
+	var brand *entities.Brand
+	if cmd.BrandID != nil {
+		brand = &entities.Brand{
+			BaseEntity: entities.BaseEntity{
+				ID: *cmd.BrandID,
+			},
+		}
+	}
+
+	var category *entities.Category
+	if cmd.CategoryID != nil {
+		category = &entities.Category{
+			BaseEntity: entities.BaseEntity{
+				ID: *cmd.CategoryID,
+			},
+		}
+	}
+
 	item := entities.CatalogItem{
 		BaseEntity: entities.BaseEntity{
 			ID:    cmd.ID,
@@ -52,8 +70,8 @@ func (h *UpdateCatalogItemHandler) Handle(
 		FullDescription:  cmd.FullDescription,
 		ImageURL:         cmd.ImageURL,
 		Price:            cmd.Price,
-		Brand:            cmd.BrandID,
-		Category:         cmd.CategoryID,
+		Brand:            brand,
+		Category:         category,
 	}
 
 	return h.repo.Update(ctx, item)

@@ -8,16 +8,16 @@ import (
 	"github.com/n0en0o/marketplace/internal/catalog/domain/repositories"
 )
 
-type CatalogItemByIdHandler struct {
+type CatalogItemByIDHandler struct {
 	repo repositories.CatalogItemRepository
 }
 
-func NewCatalogItemByIdHandler(repo repositories.CatalogItemRepository) *CatalogItemByIdHandler {
-	return &CatalogItemByIdHandler{
+func NewCatalogItemByIDHandler(repo repositories.CatalogItemRepository) *CatalogItemByIDHandler {
+	return &CatalogItemByIDHandler{
 		repo: repo,
 	}
 }
 
-func (h *CatalogItemByIdHandler) Handle(ctx context.Context, id uuid.UUID) (*entities.CatalogItem, error) {
+func (h *CatalogItemByIDHandler) Handle(ctx context.Context, id uuid.UUID) (*entities.CatalogItem, error) {
 	return h.repo.Item(ctx, id)
 }

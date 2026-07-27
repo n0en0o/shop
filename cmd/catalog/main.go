@@ -73,7 +73,7 @@ func main() {
 	listBrandsHandler := queries.NewBrandsHandler(brandRepo)
 	listCategoriesHandler := queries.NewCategoriesHandler(categoryRepo)
 	listCatalogItemsHandler := queries.NewCatalogItemsHandler(itemRepo)
-	itemByIdHandler := queries.NewCatalogItemByIdHandler(itemRepo)
+	itemByIDHandler := queries.NewCatalogItemByIDHandler(itemRepo)
 	itemsByTitleHandler := queries.NewCatalogItemsByTitleHandler(itemRepo)
 	createCatalogItemHandler := commands.NewCreateCatalogItemHandler(itemRepo)
 	updateCatalogItemHandler := commands.NewUpdateCatalogItemHandler(itemRepo)
@@ -84,7 +84,7 @@ func main() {
 	categoriesHandler := handlers.NewCategoriesHandler(listCategoriesHandler)
 	catalogItemsHandler := handlers.NewCatalogItemsHandler(
 		listCatalogItemsHandler,
-		itemByIdHandler,
+		itemByIDHandler,
 		itemsByTitleHandler,
 		itemsByBrandHandler,
 		createCatalogItemHandler,
