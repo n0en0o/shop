@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -58,7 +59,7 @@ func main() {
 	if err != nil {
 		log.Fatal("migrate.NewWithDatabaseInstance: ", err)
 	}
-	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
+	if err := m.Up(); err != nil && !errors.Is(err, migrate.ErrNoChange) {
 		log.Fatal("migrate.Up(): ", err)
 	}
 

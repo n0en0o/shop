@@ -3,6 +3,7 @@ package persistence
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -75,7 +76,7 @@ func (r *itemRepository) Item(
 
 	item, err := ScanCatalogItem(row)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			return nil, repositories.ErrItemNotFound
 		}
 		return nil, err
