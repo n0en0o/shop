@@ -163,13 +163,13 @@ func (r *itemRepository) CatalogItems(ctx context.Context, args spec.QueryArgs) 
 	brandID, err := args.ParseBrandID()
 	if err != nil {
 		return spec.Pagination[entities.CatalogItem]{},
-			fmt.Errorf("invalid brandId: %w", err)
+			fmt.Errorf("invalid brand_id: %w", err)
 	}
 
 	categoryID, err := args.ParseCategoryID()
 	if err != nil {
 		return spec.Pagination[entities.CatalogItem]{},
-			fmt.Errorf("invalid categoryId: %w", err)
+			fmt.Errorf("invalid category_id: %w", err)
 	}
 
 	if brandID != nil {

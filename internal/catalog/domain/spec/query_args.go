@@ -5,10 +5,10 @@ import "github.com/google/uuid"
 const MaxPageSize = 4
 
 type QueryArgs struct {
-	PageIndex  int     `form:"pageIndex"`
-	PageSize   int     `form:"pageSize"`
-	BrandID    *string `form:"brandId"`
-	CategoryID *string `form:"categoryId"`
+	PageIndex  int     `form:"page_index"`
+	PageSize   int     `form:"page_size"`
+	BrandID    *string `form:"brand_id"`
+	CategoryID *string `form:"category_id"`
 	Search     *string `form:"search"`
 	Sort       *string `form:"sort"`
 }
