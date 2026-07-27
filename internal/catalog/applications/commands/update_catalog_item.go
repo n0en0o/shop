@@ -2,6 +2,7 @@ package commands
 
 import (
 	"context"
+	"errors"
 
 	"github.com/google/uuid"
 	"github.com/n0en0o/marketplace/internal/catalog/domain/entities"
@@ -36,12 +37,10 @@ func (h *UpdateCatalogItemHandler) Handle(
 	cmd UpdateCatalogItemCommand,
 ) (bool, error) {
 
-	existingItem, err := h.repo.Item(ctx, cmd.ID)
-	if err != nil {
-		return false, err
-	}
-	if existingItem == nil {
+	if _, err := h.repo.Item(ctx, cmd.ID); errors.Is(err, repositories.ErrItemNotFound) {
 		return false, nil
+	} else if err != nil {
+		return false, err
 	}
 
 	item := entities.CatalogItem{

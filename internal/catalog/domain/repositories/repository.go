@@ -2,11 +2,14 @@ package repositories
 
 import (
 	"context"
+	"errors"
 
 	"github.com/google/uuid"
 	"github.com/n0en0o/marketplace/internal/catalog/domain/entities"
 	"github.com/n0en0o/marketplace/internal/catalog/domain/spec"
 )
+
+var ErrItemNotFound = errors.New("catalog item not found")
 
 type CatalogItemRepository interface {
 	Items(ctx context.Context) ([]entities.CatalogItem, error)

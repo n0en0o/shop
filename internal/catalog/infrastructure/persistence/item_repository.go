@@ -8,6 +8,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/n0en0o/marketplace/internal/catalog/domain/entities"
+	"github.com/n0en0o/marketplace/internal/catalog/domain/repositories"
 	"github.com/n0en0o/marketplace/internal/catalog/domain/spec"
 )
 
@@ -75,7 +76,7 @@ func (r *itemRepository) Item(
 	item, err := ScanCatalogItem(row)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, nil
+			return nil, repositories.ErrItemNotFound
 		}
 		return nil, err
 	}

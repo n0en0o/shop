@@ -1,10 +1,13 @@
 package handlers
 
 import (
+	"errors"
+
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/n0en0o/marketplace/internal/catalog/applications/commands"
 	"github.com/n0en0o/marketplace/internal/catalog/applications/queries"
+	"github.com/n0en0o/marketplace/internal/catalog/domain/repositories"
 )
 
 type CatalogItemsHandler struct {
@@ -58,13 +61,12 @@ func (h *CatalogItemsHandler) CatalogItemById(c *gin.Context) {
 	}
 
 	item, err := h.catalogItemById.Handle(c.Request.Context(), id)
-	if err != nil {
-		c.JSON(500, gin.H{"error": err.Error()})
+	if errors.Is(err, repositories.ErrItemNotFound) {
+		c.JSON(404, gin.H{"error": "catalog item not found"})
 		return
 	}
-
-	if item == nil {
-		c.JSON(404, gin.H{"error": "catalog item not found"})
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
 
