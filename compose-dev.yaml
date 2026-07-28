@@ -14,7 +14,7 @@ services:
     ports:
       - "9101:5432"
     volumes:
-      - postrgres_catalog_dev:/var/lib/postgresql/data
+      - postgres_catalog_dev:/var/lib/postgresql/data
     networks:
       - marketplace_dev_net
     healthcheck:
@@ -25,7 +25,7 @@ services:
       start_period: 30s
 
 volumes:
-  postrgres_catalog_dev:
+  postgres_catalog_dev:
 
 networks:
   marketplace_dev_net:

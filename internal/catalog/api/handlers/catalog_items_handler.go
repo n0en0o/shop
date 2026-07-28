@@ -83,11 +83,6 @@ func (h *CatalogItemsHandler) CatalogItemsByTitle(c *gin.Context) {
 		return
 	}
 
-	if items == nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "there is no catalog item with this title"})
-		return
-	}
-
 	c.JSON(http.StatusOK, gin.H{"items": items})
 }
 
@@ -168,11 +163,6 @@ func (h *CatalogItemsHandler) CatalogItemsByBrand(c *gin.Context) {
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
-		return
-	}
-
-	if items == nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "there is no catalog item with this brand"})
 		return
 	}
 

@@ -89,7 +89,7 @@ func (r *itemRepository) queryItems(
 	}
 	defer rows.Close()
 
-	var items []entities.CatalogItem
+	items := []entities.CatalogItem{}
 
 	for rows.Next() {
 		item, err := ScanCatalogItem(rows)
@@ -205,7 +205,7 @@ func (r *itemRepository) CatalogItems(ctx context.Context, args spec.QueryArgs) 
 	}
 	defer rows.Close()
 
-	var items []entities.CatalogItem = []entities.CatalogItem{}
+	items := []entities.CatalogItem{}
 
 	for rows.Next() {
 		item, err := ScanCatalogItem(rows)

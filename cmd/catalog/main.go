@@ -37,7 +37,7 @@ func main() {
 		log.Fatal("can't connect to db: ", err)
 	}
 
-	log.Println("connected to db successfuly")
+	log.Println("connected to db successfully")
 	driver, err := postgres.WithInstance(db, &postgres.Config{})
 	if err != nil {
 		log.Fatal("postgres.WithInstance: ", err)
@@ -51,7 +51,7 @@ func main() {
 		log.Fatal("migrate.Up(): ", err)
 	}
 
-	log.Println("miggrations completed successfuly")
+	log.Println("migrations completed successfully")
 
 	brandRepo := persistence.NewBrandRepository(db)
 	categoryRepo := persistence.NewCategoryRepository(db)
