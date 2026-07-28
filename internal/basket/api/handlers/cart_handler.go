@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -45,5 +46,6 @@ func (h *CartHandler) SaveCart(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, gin.H{
 		"account_name": accountName,
+		"location":     fmt.Sprintf("%s/%s", c.FullPath(), accountName),
 	})
 }
