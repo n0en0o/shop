@@ -24,8 +24,30 @@ services:
       retries: 5
       start_period: 30s
 
+  basket_db_dev:
+    container_name: basket_db_dev
+    image: postgres:15.3-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123456789
+      POSTGRES_DB: basket_db_dev
+    ports:
+      - "9102:5432"
+    volumes:
+      - postgres_basket_dev:/var/lib/postgresql/data
+    networks:
+      - marketplace_dev_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
 volumes:
   postgres_catalog_dev:
+  postgres_basket_dev:
 
 networks:
   marketplace_dev_net:
