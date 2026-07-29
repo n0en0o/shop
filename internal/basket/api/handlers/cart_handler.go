@@ -38,9 +38,7 @@ func (h *CartHandler) SaveCart(c *gin.Context) {
 		commands.SaveCartCommand{Cart: req.Cart},
 	)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "internal server error",
-		})
+		_ = c.Error(err)
 		return
 	}
 

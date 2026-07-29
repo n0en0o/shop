@@ -3,6 +3,7 @@ package persistence
 import (
 	"context"
 	"database/sql"
+	"fmt"
 
 	"github.com/google/uuid"
 	"github.com/n0en0o/marketplace/internal/basket/domain"
@@ -79,4 +80,64 @@ func (r *CartRepository) Save(
 	}
 
 	return &cart, nil
+}
+
+func (r *CartRepository) Get(
+	ctx context.Context,
+	accountName string,
+) (*domain.ShoppingCart, error) {
+	var exists bool
+	err := r.db.QueryRowContext(
+		ctx,
+		`SELECT EXISTS(
+			SELECT 1 FROM shopping_carts
+			WHERE account_name = $1
+		)`,
+		accountName,
+	).Scan(&exists)
+	if err != nil {
+		return nil, err
+	}
+
+	if !exists {
+		return nil, fmt.Errorf("корзины для %s не найдено", accountName)
+	}
+
+	rows, err := r.db.QueryContext(
+		ctx,
+		`SELECT item_id, quantity, unit_price, item_title, item_note
+		FROM shopping_cart_items
+		WHERE account_name = $1`,
+		accountName,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var items []domain.ShoppingCartItem
+	for rows.Next() {
+		var item domain.ShoppingCartItem
+		err := rows.Scan(
+			&item.ItemID,
+			&item.Quantity,
+			&item.UnitPrice,
+			&item.ItemTitle,
+			&item.ItemNote,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		items = append(items, item)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return &domain.ShoppingCart{
+		AccountName: accountName,
+		Items:       items,
+	}, nil
 }

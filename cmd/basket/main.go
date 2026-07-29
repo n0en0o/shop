@@ -17,6 +17,7 @@ import (
 	"github.com/n0en0o/marketplace/internal/basket/applications/commands"
 	"github.com/n0en0o/marketplace/internal/basket/config"
 	"github.com/n0en0o/marketplace/internal/basket/infrastructure/persistence"
+	"github.com/n0en0o/marketplace/internal/shared"
 )
 
 func main() {
@@ -59,6 +60,8 @@ func main() {
 	)
 
 	r := gin.Default()
+
+	r.Use(shared.ErrorHandlerMiddleware())
 
 	r.GET("/health", func(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, gin.H{"status": "ok"})
