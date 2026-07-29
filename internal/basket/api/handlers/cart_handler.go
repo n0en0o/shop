@@ -6,18 +6,22 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/n0en0o/marketplace/internal/basket/applications/commands"
+	"github.com/n0en0o/marketplace/internal/basket/applications/queries"
 	"github.com/n0en0o/marketplace/internal/basket/domain"
 )
 
 type CartHandler struct {
 	saveCart *commands.SaveCartHandler
+	getCart  *queries.GetCartHandler
 }
 
 func NewCartHandler(
 	saveCart *commands.SaveCartHandler,
+	getCart *queries.GetCartHandler,
 ) *CartHandler {
 	return &CartHandler{
 		saveCart: saveCart,
+		getCart:  getCart,
 	}
 }
 
@@ -45,5 +49,17 @@ func (h *CartHandler) SaveCart(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{
 		"account_name": accountName,
 		"location":     fmt.Sprintf("%s/%s", c.FullPath(), accountName),
+	})
+}
+
+func (h *CartHandler) GetCart(c *gin.Context) {
+	accountName := c.Param("accountName")
+	cart, err := h.getCart.Handle(c.Request.Context(), accountName)
+	if err != nil {
+		_ = c.Error(err)
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"result": cart,
 	})
 }
