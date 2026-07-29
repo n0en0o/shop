@@ -1,22 +1,22 @@
 #docker compose -p marketplace-dev -f compose-dev.yaml up -d
 #docker compose -p marketplace-dev -f compose-dev.yaml down -v
-#go run -tags postgres github.com/golang-migrate/migrate/v4/cmd/migrate@latest -verbose -path ./migrations/catalog -database "postgres://postgres:123456789@localhost:9101/catalog_db_dev?sslmode=disable" up
+#go run -tags postgres github.com/golang-migrate/migrate/v4/cmd/migrate@latest -verbose -path ./migrations/catalog -database "postgres://postgres:123456789@localhost:9101/catalog-db-dev?sslmode=disable" up
 
 services:
-  catalog_db_dev:
-    container_name: catalog_db_dev
+  catalog-db-dev:
+    container_name: catalog-db-dev
     image: postgres:15.3-alpine
     restart: always
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 123456789
-      POSTGRES_DB: catalog_db_dev
+      POSTGRES_DB: catalog-db-dev
     ports:
       - "9101:5432"
     volumes:
-      - postgres_catalog_dev:/var/lib/postgresql/data
+      - postgres-catalog-dev:/var/lib/postgresql/data
     networks:
-      - marketplace_dev_net
+      - marketplace-dev-net
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
@@ -24,31 +24,44 @@ services:
       retries: 5
       start_period: 30s
 
-  basket_db_dev:
-    container_name: basket_db_dev
+  basket-db-dev:
+    container_name: basket-db-dev
     image: postgres:15.3-alpine
     restart: always
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 123456789
-      POSTGRES_DB: basket_db_dev
+      POSTGRES_DB: basket-db-dev
     ports:
       - "9102:5432"
     volumes:
-      - postgres_basket_dev:/var/lib/postgresql/data
+      - postgres-basket-dev:/var/lib/postgresql/data
     networks:
-      - marketplace_dev_net
+      - marketplace-dev-net
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 30s
+  
+  basket-cache-redis-dev:
+    container_name: basket-redis-dev
+    image: redis:7
+    command: redis-server --requirepass "123456789" --protected-mode no
+    restart: always
+    ports:
+      - "9112:6379"
+    volumes:
+      - redis-basket-dev:/data 
+    networks:
+      - marketplace-dev-net
 
 volumes:
-  postgres_catalog_dev:
-  postgres_basket_dev:
+  postgres-catalog-dev:
+  postgres-basket-dev:
+  redis-basket-dev:
 
 networks:
-  marketplace_dev_net:
+  marketplace-dev-net:
     driver: bridge

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"log"
@@ -15,10 +16,13 @@ import (
 	"github.com/n0en0o/marketplace/internal/basket/api"
 	"github.com/n0en0o/marketplace/internal/basket/api/handlers"
 	"github.com/n0en0o/marketplace/internal/basket/applications/commands"
+	"github.com/n0en0o/marketplace/internal/basket/applications/interfaces"
 	"github.com/n0en0o/marketplace/internal/basket/applications/queries"
 	"github.com/n0en0o/marketplace/internal/basket/config"
+	"github.com/n0en0o/marketplace/internal/basket/infrastructure/cache"
 	"github.com/n0en0o/marketplace/internal/basket/infrastructure/persistence"
 	"github.com/n0en0o/marketplace/internal/shared"
+	"github.com/redis/go-redis/v9"
 )
 
 func main() {
@@ -54,7 +58,25 @@ func main() {
 
 	log.Println("basket migrations completed successfully")
 
-	repo := persistence.NewCartRepository(db)
+	redisClient := redis.NewClient(&redis.Options{
+		Addr:     cfg.RedisURL,
+		Password: cfg.RedisPassword,
+		DB:       0,
+	})
+
+	if err := redisClient.Ping(context.Background()).Err(); err != nil {
+		log.Fatal("redis ping: ", err)
+	}
+
+	log.Println("redis connected")
+	defer redisClient.Close()
+
+	pgRepo := persistence.NewCartRepository(db)
+	var repo interfaces.CartRepository = cache.NewRedisCartRepository(
+		pgRepo,
+		redisClient,
+	)
+
 	saveCartHandler := commands.NewSaveCartHandler(repo)
 	getCartHandler := queries.NewGetCartHandler(repo)
 	removeCartHandler := commands.NewRemoveCartHandler(repo)
