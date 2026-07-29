@@ -19,6 +19,7 @@ func ErrorHandlerMiddleware() gin.HandlerFunc {
 		err := c.Errors.Last().Err
 
 		var validationErrs validator.ValidationErrors
+		var notFound *NotFoundError
 
 		switch {
 		case errors.As(err, &validationErrs):
@@ -36,8 +37,16 @@ func ErrorHandlerMiddleware() gin.HandlerFunc {
 				"status":           http.StatusBadRequest,
 				"validationErrors": fields,
 			})
+
+		case errors.As(err, &notFound):
+			c.JSON(http.StatusNotFound, gin.H{
+				"title":   "Ресурс не найден",
+				"details": notFound.Error(),
+				"status":  http.StatusNotFound,
+			})
+
 		default:
-			c.JSON(http.StatusBadRequest, gin.H{
+			c.JSON(http.StatusInternalServerError, gin.H{
 				"title":   "Внутренняя ошибка сервера",
 				"details": "Произошла непредвиденная ошибка",
 				"status":  http.StatusInternalServerError,

@@ -3,10 +3,10 @@ package persistence
 import (
 	"context"
 	"database/sql"
-	"fmt"
 
 	"github.com/google/uuid"
 	"github.com/n0en0o/marketplace/internal/basket/domain"
+	"github.com/n0en0o/marketplace/internal/shared"
 )
 
 type CartRepository struct {
@@ -100,7 +100,7 @@ func (r *CartRepository) Get(
 	}
 
 	if !exists {
-		return nil, fmt.Errorf("корзины для %s не найдено", accountName)
+		return nil, shared.NewNotFoundError("Shopping Cart", accountName)
 	}
 
 	rows, err := r.db.QueryContext(
@@ -140,4 +140,38 @@ func (r *CartRepository) Get(
 		AccountName: accountName,
 		Items:       items,
 	}, nil
+}
+
+func (r *CartRepository) Remove(
+	ctx context.Context,
+	accountName string,
+) (bool, error) {
+	var exists bool
+	err := r.db.QueryRowContext(
+		ctx,
+		`SELECT EXISTS(
+			SELECT 1 FROM shopping_carts
+			WHERE account_name = $1
+		)`,
+		accountName,
+	).Scan(&exists)
+	if err != nil {
+		return false, err
+	}
+
+	if !exists {
+		return false, shared.NewNotFoundError("ShoppingCart", accountName)
+	}
+
+	_, err = r.db.ExecContext(
+		ctx,
+		`DELETE FROM shopping_carts
+		WHERE account_name = $1`,
+		accountName,
+	)
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
 }

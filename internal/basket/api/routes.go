@@ -10,5 +10,7 @@ func RegisterRoutes(
 	cartHandler *handlers.CartHandler,
 ) {
 	v1 := r.Group("/api/v1")
-	v1.POST("/cart", cartHandler.SaveCart) // http://localhost:9002/api/v1/cart
+	v1.POST("/cart", cartHandler.SaveCart)                  // http://localhost:9002/api/v1/cart
+	v1.GET("/cart/:accountName", cartHandler.GetCart)       // http://localhost:9002/api/v1//cart/:accountName
+	v1.DELETE("/cart/:accountName", cartHandler.RemoveCart) // http://localhost:9002/api/v1//cart/:accountName
 }

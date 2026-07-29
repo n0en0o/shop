@@ -11,17 +11,20 @@ import (
 )
 
 type CartHandler struct {
-	saveCart *commands.SaveCartHandler
-	getCart  *queries.GetCartHandler
+	saveCart   *commands.SaveCartHandler
+	getCart    *queries.GetCartHandler
+	removeCart *commands.RemoveCartHandler
 }
 
 func NewCartHandler(
 	saveCart *commands.SaveCartHandler,
 	getCart *queries.GetCartHandler,
+	removeCart *commands.RemoveCartHandler,
 ) *CartHandler {
 	return &CartHandler{
-		saveCart: saveCart,
-		getCart:  getCart,
+		saveCart:   saveCart,
+		getCart:    getCart,
+		removeCart: removeCart,
 	}
 }
 
@@ -61,5 +64,21 @@ func (h *CartHandler) GetCart(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"result": cart,
+	})
+}
+
+func (h *CartHandler) RemoveCart(c *gin.Context) {
+	accountName := c.Param("accountName")
+	success, err := h.removeCart.Handle(
+		c.Request.Context(),
+		accountName,
+	)
+	if err != nil {
+		_ = c.Error(err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": success,
 	})
 }

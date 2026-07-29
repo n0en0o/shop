@@ -15,6 +15,7 @@ import (
 	"github.com/n0en0o/marketplace/internal/basket/api"
 	"github.com/n0en0o/marketplace/internal/basket/api/handlers"
 	"github.com/n0en0o/marketplace/internal/basket/applications/commands"
+	"github.com/n0en0o/marketplace/internal/basket/applications/queries"
 	"github.com/n0en0o/marketplace/internal/basket/config"
 	"github.com/n0en0o/marketplace/internal/basket/infrastructure/persistence"
 	"github.com/n0en0o/marketplace/internal/shared"
@@ -55,8 +56,12 @@ func main() {
 
 	repo := persistence.NewCartRepository(db)
 	saveCartHandler := commands.NewSaveCartHandler(repo)
+	getCartHandler := queries.NewGetCartHandler(repo)
+	removeCartHandler := commands.NewRemoveCartHandler(repo)
 	cartHandler := handlers.NewCartHandler(
 		saveCartHandler,
+		getCartHandler,
+		removeCartHandler,
 	)
 
 	r := gin.Default()
