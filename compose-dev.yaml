@@ -57,10 +57,30 @@ services:
     networks:
       - marketplace-dev-net
 
+  promotion-db:
+    container_name: promotion-db-dev
+    image: mysql:8.0
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456789
+      - MYSQL_DATABASE=promotion-db
+    restart: always
+    ports:
+      - "9103:3306"
+    volumes:
+      - mysql-promotion:/var/lib/mysql
+    networks:
+      - marketplace-dev-net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p123456789"]
+      interval: 2s
+      timeout: 2s
+      retries: 10
+
 volumes:
   postgres-catalog-dev:
   postgres-basket-dev:
   redis-basket-dev:
+  mysql-promotion:
 
 networks:
   marketplace-dev-net:
