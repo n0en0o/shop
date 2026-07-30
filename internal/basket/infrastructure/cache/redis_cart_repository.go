@@ -3,6 +3,7 @@ package cache
 import (
 	"context"
 	"encoding/json"
+	"log"
 	"time"
 
 	"github.com/n0en0o/marketplace/internal/basket/domain"
@@ -39,7 +40,9 @@ func (r *RedisCartRepository) Save(
 
 	data, err := json.Marshal(result)
 	if err == nil {
-		_ = r.client.Set(ctx, result.AccountName, data, cacheTTL).Err()
+		if err := r.client.Set(ctx, result.AccountName, data, cacheTTL).Err(); err != nil {
+			log.Printf("cache set failed: %v", err)
+		}
 	}
 
 	return result, nil
@@ -64,7 +67,9 @@ func (r *RedisCartRepository) Get(
 	}
 
 	if data, err := json.Marshal(cart); err == nil {
-		_ = r.client.Set(ctx, accountName, data, cacheTTL).Err()
+		if err := r.client.Set(ctx, accountName, data, cacheTTL).Err(); err != nil {
+			log.Printf("cache set failed: %v", err)
+		}
 	}
 
 	return cart, nil
