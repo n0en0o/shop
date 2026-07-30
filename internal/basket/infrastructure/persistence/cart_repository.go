@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/google/uuid"
 	"github.com/n0en0o/marketplace/internal/basket/domain"
 	"github.com/n0en0o/marketplace/internal/shared"
 )
@@ -49,10 +48,6 @@ func (r *CartRepository) Save(
 	}
 
 	for _, item := range cart.Items {
-		if item.ItemID == uuid.Nil {
-			item.ItemID = uuid.New()
-		}
-
 		_, err = tx.ExecContext(
 			ctx,
 			`INSERT INTO shopping_cart_items (

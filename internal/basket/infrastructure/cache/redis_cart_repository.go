@@ -12,7 +12,10 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-const cacheTTL = 30 * time.Second
+const (
+	cacheKeyPrefix = "cart:"
+	cacheTTL       = 30 * time.Minute
+)
 
 type RedisCartRepository struct {
 	repo   repositories.CartRepository
@@ -41,7 +44,7 @@ func (r *RedisCartRepository) Save(
 
 	data, err := json.Marshal(result)
 	if err == nil {
-		if err := r.client.Set(ctx, result.AccountName, data, cacheTTL).Err(); err != nil {
+		if err := r.client.Set(ctx, cartCacheKey(result.AccountName), data, cacheTTL).Err(); err != nil {
 			log.Printf("cache set failed: %v", err)
 		}
 	}
@@ -53,8 +56,9 @@ func (r *RedisCartRepository) Get(
 	ctx context.Context,
 	accountName string,
 ) (*domain.ShoppingCart, error) {
+	cacheKey := cartCacheKey(accountName)
 
-	cached, err := r.client.Get(ctx, accountName).Result()
+	cached, err := r.client.Get(ctx, cacheKey).Result()
 	if err == nil && cached != "" {
 		var cart domain.ShoppingCart
 		if err := json.Unmarshal([]byte(cached), &cart); err == nil {
@@ -70,7 +74,7 @@ func (r *RedisCartRepository) Get(
 	}
 
 	if data, err := json.Marshal(cart); err == nil {
-		if err := r.client.Set(ctx, accountName, data, cacheTTL).Err(); err != nil {
+		if err := r.client.Set(ctx, cacheKey, data, cacheTTL).Err(); err != nil {
 			log.Printf("cache set failed: %v", err)
 		}
 	}
@@ -87,7 +91,11 @@ func (r *RedisCartRepository) Remove(
 		return false, err
 	}
 
-	_ = r.client.Del(ctx, accountName).Err()
+	_ = r.client.Del(ctx, cartCacheKey(accountName)).Err()
 
 	return result, nil
+}
+
+func cartCacheKey(accountName string) string {
+	return cacheKeyPrefix + accountName
 }
