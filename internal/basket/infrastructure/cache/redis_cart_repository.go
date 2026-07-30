@@ -3,6 +3,7 @@ package cache
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"log"
 	"time"
 
@@ -59,6 +60,8 @@ func (r *RedisCartRepository) Get(
 		if err := json.Unmarshal([]byte(cached), &cart); err == nil {
 			return &cart, nil
 		}
+	} else if err != nil && !errors.Is(err, redis.Nil) {
+		log.Printf("cache get failed: %v", err)
 	}
 
 	cart, err := r.repo.Get(ctx, accountName)
