@@ -3,15 +3,15 @@ package commands
 import (
 	"context"
 
-	"github.com/n0en0o/marketplace/internal/basket/applications/interfaces"
+	"github.com/n0en0o/marketplace/internal/basket/domain/repositories"
 )
 
 type RemoveCartHandler struct {
-	repo interfaces.CartRepository
+	repo repositories.CartRepository
 }
 
 func NewRemoveCartHandler(
-	repo interfaces.CartRepository,
+	repo repositories.CartRepository,
 ) *RemoveCartHandler {
 	return &RemoveCartHandler{repo: repo}
 }

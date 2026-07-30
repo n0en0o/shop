@@ -5,20 +5,20 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/n0en0o/marketplace/internal/basket/applications/interfaces"
 	"github.com/n0en0o/marketplace/internal/basket/domain"
+	"github.com/n0en0o/marketplace/internal/basket/domain/repositories"
 	"github.com/redis/go-redis/v9"
 )
 
 const cacheTTL = 30 * time.Second
 
 type RedisCartRepository struct {
-	repo   interfaces.CartRepository
+	repo   repositories.CartRepository
 	client *redis.Client
 }
 
 func NewRedisCartRepository(
-	repo interfaces.CartRepository,
+	repo repositories.CartRepository,
 	client *redis.Client,
 ) *RedisCartRepository {
 	return &RedisCartRepository{

@@ -16,9 +16,9 @@ import (
 	"github.com/n0en0o/marketplace/internal/basket/api"
 	"github.com/n0en0o/marketplace/internal/basket/api/handlers"
 	"github.com/n0en0o/marketplace/internal/basket/applications/commands"
-	"github.com/n0en0o/marketplace/internal/basket/applications/interfaces"
 	"github.com/n0en0o/marketplace/internal/basket/applications/queries"
 	"github.com/n0en0o/marketplace/internal/basket/config"
+	"github.com/n0en0o/marketplace/internal/basket/domain/repositories"
 	"github.com/n0en0o/marketplace/internal/basket/infrastructure/cache"
 	"github.com/n0en0o/marketplace/internal/basket/infrastructure/persistence"
 	"github.com/n0en0o/marketplace/internal/shared"
@@ -72,7 +72,7 @@ func main() {
 	defer redisClient.Close()
 
 	pgRepo := persistence.NewCartRepository(db)
-	var repo interfaces.CartRepository = cache.NewRedisCartRepository(
+	var repo repositories.CartRepository = cache.NewRedisCartRepository(
 		pgRepo,
 		redisClient,
 	)

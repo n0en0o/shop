@@ -3,16 +3,16 @@ package queries
 import (
 	"context"
 
-	"github.com/n0en0o/marketplace/internal/basket/applications/interfaces"
 	"github.com/n0en0o/marketplace/internal/basket/domain"
+	"github.com/n0en0o/marketplace/internal/basket/domain/repositories"
 )
 
 type GetCartHandler struct {
-	repo interfaces.CartRepository
+	repo repositories.CartRepository
 }
 
 func NewGetCartHandler(
-	repo interfaces.CartRepository,
+	repo repositories.CartRepository,
 ) *GetCartHandler {
 	return &GetCartHandler{repo: repo}
 }
