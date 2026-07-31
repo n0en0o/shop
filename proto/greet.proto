@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+option go_package = "github.com/n0en0o/marketplace/internal/promotion/grpc/pb";
+
+package greet;
+
+// Greeter обеспечивает операцию приветствия
+service Greeter {
+    // SayHello отправляет ответ с приветствием для указанного имени
+    rpc SayHello(HelloRequest) returns (HelloReply);
+}
+
+message HelloRequest {
+    string name = 1;
+}
+
+message HelloReply {
+    string msg = 1;
+}

@@ -11,11 +11,13 @@ import (
 type Config struct {
 	DatabaseURL    string
 	MigrationsPath string
+	GRPCPort       string
 }
 
 const (
 	defaultDatabaseURL    = "root:123456789@tcp(localhost:9103)/promotion-db?parseTime=true&multiStatements=true"
 	defaultMigrationsPath = "file://migrations/promotion"
+	defaultGRPCPort       = "9003"
 )
 
 func Load() (Config, error) {
@@ -24,6 +26,7 @@ func Load() (Config, error) {
 	cfg := Config{
 		DatabaseURL:    getEnv("PROMOTION_DATABASE_URL", defaultDatabaseURL),
 		MigrationsPath: getEnv("PROMOTION_MIGRATIONS_PATH", defaultMigrationsPath),
+		GRPCPort:       getEnv("PROMOTION_GRPC_PORT", defaultGRPCPort),
 	}
 
 	if err := cfg.Validate(); err != nil {
@@ -41,6 +44,9 @@ func (c Config) Validate() error {
 	}
 	if strings.TrimSpace(c.MigrationsPath) == "" {
 		missing = append(missing, "PROMOTION_MIGRATIONS_PATH")
+	}
+	if strings.TrimSpace(c.GRPCPort) == "" {
+		missing = append(missing, "PROMOTION_GRPC_PORT")
 	}
 
 	if len(missing) > 0 {
