@@ -109,6 +109,102 @@ func (x *HelloReply) GetMsg() string {
 	return ""
 }
 
+type AddRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	A             int64                  `protobuf:"varint,1,opt,name=a,proto3" json:"a,omitempty"`
+	B             int64                  `protobuf:"varint,2,opt,name=b,proto3" json:"b,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AddRequest) Reset() {
+	*x = AddRequest{}
+	mi := &file_greet_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AddRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AddRequest) ProtoMessage() {}
+
+func (x *AddRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_greet_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AddRequest.ProtoReflect.Descriptor instead.
+func (*AddRequest) Descriptor() ([]byte, []int) {
+	return file_greet_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *AddRequest) GetA() int64 {
+	if x != nil {
+		return x.A
+	}
+	return 0
+}
+
+func (x *AddRequest) GetB() int64 {
+	if x != nil {
+		return x.B
+	}
+	return 0
+}
+
+type AddReply struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Result        int64                  `protobuf:"varint,1,opt,name=result,proto3" json:"result,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AddReply) Reset() {
+	*x = AddReply{}
+	mi := &file_greet_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AddReply) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AddReply) ProtoMessage() {}
+
+func (x *AddReply) ProtoReflect() protoreflect.Message {
+	mi := &file_greet_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AddReply.ProtoReflect.Descriptor instead.
+func (*AddReply) Descriptor() ([]byte, []int) {
+	return file_greet_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *AddReply) GetResult() int64 {
+	if x != nil {
+		return x.Result
+	}
+	return 0
+}
+
 var File_greet_proto protoreflect.FileDescriptor
 
 const file_greet_proto_rawDesc = "" +
@@ -118,9 +214,16 @@ const file_greet_proto_rawDesc = "" +
 	"\x04name\x18\x01 \x01(\tR\x04name\"\x1e\n" +
 	"\n" +
 	"HelloReply\x12\x10\n" +
-	"\x03msg\x18\x01 \x01(\tR\x03msg2=\n" +
+	"\x03msg\x18\x01 \x01(\tR\x03msg\"(\n" +
+	"\n" +
+	"AddRequest\x12\f\n" +
+	"\x01a\x18\x01 \x01(\x03R\x01a\x12\f\n" +
+	"\x01b\x18\x02 \x01(\x03R\x01b\"\"\n" +
+	"\bAddReply\x12\x16\n" +
+	"\x06result\x18\x01 \x01(\x03R\x06result2h\n" +
 	"\aGreeter\x122\n" +
-	"\bSayHello\x12\x13.greet.HelloRequest\x1a\x11.greet.HelloReplyB:Z8github.com/n0en0o/marketplace/internal/promotion/grpc/pbb\x06proto3"
+	"\bSayHello\x12\x13.greet.HelloRequest\x1a\x11.greet.HelloReply\x12)\n" +
+	"\x03Add\x12\x11.greet.AddRequest\x1a\x0f.greet.AddReplyB:Z8github.com/n0en0o/marketplace/internal/promotion/grpc/pbb\x06proto3"
 
 var (
 	file_greet_proto_rawDescOnce sync.Once
@@ -134,16 +237,20 @@ func file_greet_proto_rawDescGZIP() []byte {
 	return file_greet_proto_rawDescData
 }
 
-var file_greet_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_greet_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_greet_proto_goTypes = []any{
 	(*HelloRequest)(nil), // 0: greet.HelloRequest
 	(*HelloReply)(nil),   // 1: greet.HelloReply
+	(*AddRequest)(nil),   // 2: greet.AddRequest
+	(*AddReply)(nil),     // 3: greet.AddReply
 }
 var file_greet_proto_depIdxs = []int32{
 	0, // 0: greet.Greeter.SayHello:input_type -> greet.HelloRequest
-	1, // 1: greet.Greeter.SayHello:output_type -> greet.HelloReply
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
+	2, // 1: greet.Greeter.Add:input_type -> greet.AddRequest
+	1, // 2: greet.Greeter.SayHello:output_type -> greet.HelloReply
+	3, // 3: greet.Greeter.Add:output_type -> greet.AddReply
+	2, // [2:4] is the sub-list for method output_type
+	0, // [0:2] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
@@ -160,7 +267,7 @@ func file_greet_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_greet_proto_rawDesc), len(file_greet_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

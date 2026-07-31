@@ -20,6 +20,7 @@ import (
 	promotiongrpc "github.com/n0en0o/marketplace/internal/promotion/grpc"
 	"github.com/n0en0o/marketplace/internal/promotion/grpc/pb"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 )
 
 func main() {
@@ -95,6 +96,7 @@ func runGRPCServer(ctx context.Context, port string) error {
 	greeterService := promotiongrpc.NewGreeterService()
 
 	pb.RegisterGreeterServer(grpcServer, greeterService)
+	reflection.Register(grpcServer)
 
 	go func() {
 		<-ctx.Done()

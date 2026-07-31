@@ -15,7 +15,7 @@ type Config struct {
 }
 
 const (
-	defaultDatabaseURL    = "root:123456789@tcp(localhost:9103)/promotion-db?parseTime=true&multiStatements=true"
+	defaultDatabaseURL    = "root:123456789@tcp(127.0.0.1:9103)/promotion-db?parseTime=true&multiStatements=true"
 	defaultMigrationsPath = "file://migrations/promotion"
 	defaultGRPCPort       = "9003"
 )

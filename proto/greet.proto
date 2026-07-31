@@ -8,6 +8,7 @@ package greet;
 service Greeter {
     // SayHello отправляет ответ с приветствием для указанного имени
     rpc SayHello(HelloRequest) returns (HelloReply);
+    rpc Add(AddRequest) returns (AddReply);
 }
 
 message HelloRequest {
@@ -16,4 +17,13 @@ message HelloRequest {
 
 message HelloReply {
     string msg = 1;
+}
+
+message AddRequest {
+    int64 a = 1;
+    int64 b = 2;
+}
+
+message AddReply {
+    int64 result = 1;
 }

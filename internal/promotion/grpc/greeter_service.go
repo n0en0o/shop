@@ -23,3 +23,12 @@ func (s *GreeterService) SayHello(
 		Msg: fmt.Sprintf("Hello %s!", req.GetName()),
 	}, nil
 }
+
+func (s *GreeterService) Add(
+	_ context.Context,
+	req *pb.AddRequest,
+) (*pb.AddReply, error) {
+	return &pb.AddReply{
+		Result: req.GetA() + req.GetB(),
+	}, nil
+}

@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+option go_package = "github.com/n0en0o/marketplace/internal/promotion/grpc/pb";
+
+package promotion;
+
+// PromotionService
+service PromotionService {
+    // GetPromoByCatalogItem
+    rpc GetPromoByCatalogItem(GetPromoByCatalogItemRequest)
+        returns (GetPromoByCatalogItemResponse);
+}
+
+message GetPromoByCatalogItemRequest {
+    string catalog_item_id = 1;
+}
+
+message GetPromoByCatalogItemResponse {
+    Promotion promotion = 1;
+}
+
+message Promotion {
+    string id = 1;
+    string catalog_item_id = 2;
+    string title = 3;
+    string value = 4;
+}
