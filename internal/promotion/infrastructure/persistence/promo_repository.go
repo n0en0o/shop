@@ -48,3 +48,32 @@ func (r *PromoRepository) FindByCatalogItem(
 
 	return &p, nil
 }
+
+func (r *PromoRepository) Create(
+	ctx context.Context,
+	promo *domain.Promo,
+) (bool, error) {
+	const query = `
+	INSERT INTO promos (id, catalog_item_id, title, value)
+	VALUES (?, ?, ?, ?)
+	`
+
+	result, err := r.db.ExecContext(
+		ctx,
+		query,
+		promo.ID,
+		promo.CatalogItemID,
+		promo.Title,
+		promo.Value,
+	)
+	if err != nil {
+		return false, err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return false, err
+	}
+
+	return rowsAffected > 0, nil
+}

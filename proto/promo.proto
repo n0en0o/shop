@@ -9,6 +9,10 @@ service PromotionService {
     // GetPromoByCatalogItem
     rpc GetPromoByCatalogItem(GetPromoByCatalogItemRequest)
         returns (GetPromoByCatalogItemResponse);
+
+    //CreatePromo
+    rpc CreatePromo(CreatePromoRequest) 
+        returns (CreatePromoResponse);
 }
 
 message GetPromoByCatalogItemRequest {
@@ -24,4 +28,16 @@ message Promotion {
     string catalog_item_id = 2;
     string title = 3;
     string value = 4;
+}
+
+message CreatePromoRequest {
+    string catalog_item_id = 1;
+    string title = 2;
+    string value = 3;
+}
+
+message CreatePromoResponse {
+    string id = 1;
+    bool success = 2;
+    string description = 3;
 }

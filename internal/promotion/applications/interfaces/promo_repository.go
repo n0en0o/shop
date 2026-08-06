@@ -8,4 +8,5 @@ import (
 
 type PromotionRepository interface {
 	FindByCatalogItem(ctx context.Context, catalogItemID string) (*domain.Promo, error)
+	Create(ctx context.Context, promo *domain.Promo) (bool, error)
 }

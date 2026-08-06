@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	PromotionService_GetPromoByCatalogItem_FullMethodName = "/promotion.PromotionService/GetPromoByCatalogItem"
+	PromotionService_CreatePromo_FullMethodName           = "/promotion.PromotionService/CreatePromo"
 )
 
 // PromotionServiceClient is the client API for PromotionService service.
@@ -30,6 +31,8 @@ const (
 type PromotionServiceClient interface {
 	// GetPromoByCatalogItem
 	GetPromoByCatalogItem(ctx context.Context, in *GetPromoByCatalogItemRequest, opts ...grpc.CallOption) (*GetPromoByCatalogItemResponse, error)
+	// CreatePromo
+	CreatePromo(ctx context.Context, in *CreatePromoRequest, opts ...grpc.CallOption) (*CreatePromoResponse, error)
 }
 
 type promotionServiceClient struct {
@@ -50,6 +53,16 @@ func (c *promotionServiceClient) GetPromoByCatalogItem(ctx context.Context, in *
 	return out, nil
 }
 
+func (c *promotionServiceClient) CreatePromo(ctx context.Context, in *CreatePromoRequest, opts ...grpc.CallOption) (*CreatePromoResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreatePromoResponse)
+	err := c.cc.Invoke(ctx, PromotionService_CreatePromo_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // PromotionServiceServer is the server API for PromotionService service.
 // All implementations must embed UnimplementedPromotionServiceServer
 // for forward compatibility.
@@ -58,6 +71,8 @@ func (c *promotionServiceClient) GetPromoByCatalogItem(ctx context.Context, in *
 type PromotionServiceServer interface {
 	// GetPromoByCatalogItem
 	GetPromoByCatalogItem(context.Context, *GetPromoByCatalogItemRequest) (*GetPromoByCatalogItemResponse, error)
+	// CreatePromo
+	CreatePromo(context.Context, *CreatePromoRequest) (*CreatePromoResponse, error)
 	mustEmbedUnimplementedPromotionServiceServer()
 }
 
@@ -70,6 +85,9 @@ type UnimplementedPromotionServiceServer struct{}
 
 func (UnimplementedPromotionServiceServer) GetPromoByCatalogItem(context.Context, *GetPromoByCatalogItemRequest) (*GetPromoByCatalogItemResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetPromoByCatalogItem not implemented")
+}
+func (UnimplementedPromotionServiceServer) CreatePromo(context.Context, *CreatePromoRequest) (*CreatePromoResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreatePromo not implemented")
 }
 func (UnimplementedPromotionServiceServer) mustEmbedUnimplementedPromotionServiceServer() {}
 func (UnimplementedPromotionServiceServer) testEmbeddedByValue()                          {}
@@ -110,6 +128,24 @@ func _PromotionService_GetPromoByCatalogItem_Handler(srv interface{}, ctx contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _PromotionService_CreatePromo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreatePromoRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PromotionServiceServer).CreatePromo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PromotionService_CreatePromo_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PromotionServiceServer).CreatePromo(ctx, req.(*CreatePromoRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // PromotionService_ServiceDesc is the grpc.ServiceDesc for PromotionService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -120,6 +156,10 @@ var PromotionService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetPromoByCatalogItem",
 			Handler:    _PromotionService_GetPromoByCatalogItem_Handler,
+		},
+		{
+			MethodName: "CreatePromo",
+			Handler:    _PromotionService_CreatePromo_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

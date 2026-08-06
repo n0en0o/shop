@@ -177,6 +177,126 @@ func (x *Promotion) GetValue() string {
 	return ""
 }
 
+type CreatePromoRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	CatalogItemId string                 `protobuf:"bytes,1,opt,name=catalog_item_id,json=catalogItemId,proto3" json:"catalog_item_id,omitempty"`
+	Title         string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
+	Value         string                 `protobuf:"bytes,3,opt,name=value,proto3" json:"value,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreatePromoRequest) Reset() {
+	*x = CreatePromoRequest{}
+	mi := &file_promo_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreatePromoRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreatePromoRequest) ProtoMessage() {}
+
+func (x *CreatePromoRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_promo_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreatePromoRequest.ProtoReflect.Descriptor instead.
+func (*CreatePromoRequest) Descriptor() ([]byte, []int) {
+	return file_promo_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *CreatePromoRequest) GetCatalogItemId() string {
+	if x != nil {
+		return x.CatalogItemId
+	}
+	return ""
+}
+
+func (x *CreatePromoRequest) GetTitle() string {
+	if x != nil {
+		return x.Title
+	}
+	return ""
+}
+
+func (x *CreatePromoRequest) GetValue() string {
+	if x != nil {
+		return x.Value
+	}
+	return ""
+}
+
+type CreatePromoResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Success       bool                   `protobuf:"varint,2,opt,name=success,proto3" json:"success,omitempty"`
+	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreatePromoResponse) Reset() {
+	*x = CreatePromoResponse{}
+	mi := &file_promo_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreatePromoResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreatePromoResponse) ProtoMessage() {}
+
+func (x *CreatePromoResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_promo_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreatePromoResponse.ProtoReflect.Descriptor instead.
+func (*CreatePromoResponse) Descriptor() ([]byte, []int) {
+	return file_promo_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *CreatePromoResponse) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *CreatePromoResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *CreatePromoResponse) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
 var File_promo_proto protoreflect.FileDescriptor
 
 const file_promo_proto_rawDesc = "" +
@@ -190,9 +310,18 @@ const file_promo_proto_rawDesc = "" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12&\n" +
 	"\x0fcatalog_item_id\x18\x02 \x01(\tR\rcatalogItemId\x12\x14\n" +
 	"\x05title\x18\x03 \x01(\tR\x05title\x12\x14\n" +
-	"\x05value\x18\x04 \x01(\tR\x05value2~\n" +
+	"\x05value\x18\x04 \x01(\tR\x05value\"h\n" +
+	"\x12CreatePromoRequest\x12&\n" +
+	"\x0fcatalog_item_id\x18\x01 \x01(\tR\rcatalogItemId\x12\x14\n" +
+	"\x05title\x18\x02 \x01(\tR\x05title\x12\x14\n" +
+	"\x05value\x18\x03 \x01(\tR\x05value\"a\n" +
+	"\x13CreatePromoResponse\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x18\n" +
+	"\asuccess\x18\x02 \x01(\bR\asuccess\x12 \n" +
+	"\vdescription\x18\x03 \x01(\tR\vdescription2\xcc\x01\n" +
 	"\x10PromotionService\x12j\n" +
-	"\x15GetPromoByCatalogItem\x12'.promotion.GetPromoByCatalogItemRequest\x1a(.promotion.GetPromoByCatalogItemResponseB:Z8github.com/n0en0o/marketplace/internal/promotion/grpc/pbb\x06proto3"
+	"\x15GetPromoByCatalogItem\x12'.promotion.GetPromoByCatalogItemRequest\x1a(.promotion.GetPromoByCatalogItemResponse\x12L\n" +
+	"\vCreatePromo\x12\x1d.promotion.CreatePromoRequest\x1a\x1e.promotion.CreatePromoResponseB:Z8github.com/n0en0o/marketplace/internal/promotion/grpc/pbb\x06proto3"
 
 var (
 	file_promo_proto_rawDescOnce sync.Once
@@ -206,18 +335,22 @@ func file_promo_proto_rawDescGZIP() []byte {
 	return file_promo_proto_rawDescData
 }
 
-var file_promo_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_promo_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_promo_proto_goTypes = []any{
 	(*GetPromoByCatalogItemRequest)(nil),  // 0: promotion.GetPromoByCatalogItemRequest
 	(*GetPromoByCatalogItemResponse)(nil), // 1: promotion.GetPromoByCatalogItemResponse
 	(*Promotion)(nil),                     // 2: promotion.Promotion
+	(*CreatePromoRequest)(nil),            // 3: promotion.CreatePromoRequest
+	(*CreatePromoResponse)(nil),           // 4: promotion.CreatePromoResponse
 }
 var file_promo_proto_depIdxs = []int32{
 	2, // 0: promotion.GetPromoByCatalogItemResponse.promotion:type_name -> promotion.Promotion
 	0, // 1: promotion.PromotionService.GetPromoByCatalogItem:input_type -> promotion.GetPromoByCatalogItemRequest
-	1, // 2: promotion.PromotionService.GetPromoByCatalogItem:output_type -> promotion.GetPromoByCatalogItemResponse
-	2, // [2:3] is the sub-list for method output_type
-	1, // [1:2] is the sub-list for method input_type
+	3, // 2: promotion.PromotionService.CreatePromo:input_type -> promotion.CreatePromoRequest
+	1, // 3: promotion.PromotionService.GetPromoByCatalogItem:output_type -> promotion.GetPromoByCatalogItemResponse
+	4, // 4: promotion.PromotionService.CreatePromo:output_type -> promotion.CreatePromoResponse
+	3, // [3:5] is the sub-list for method output_type
+	1, // [1:3] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name
 	1, // [1:1] is the sub-list for extension extendee
 	0, // [0:1] is the sub-list for field type_name
@@ -234,7 +367,7 @@ func file_promo_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_promo_proto_rawDesc), len(file_promo_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   3,
+			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
