@@ -16,9 +16,11 @@ import (
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/mysql"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
+	"github.com/n0en0o/marketplace/internal/promotion/applications/queries"
 	"github.com/n0en0o/marketplace/internal/promotion/config"
 	promotiongrpc "github.com/n0en0o/marketplace/internal/promotion/grpc"
 	"github.com/n0en0o/marketplace/internal/promotion/grpc/pb"
+	"github.com/n0en0o/marketplace/internal/promotion/infrastructure/persistence"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
@@ -44,7 +46,7 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
-	if err := runGRPCServer(ctx, cfg.GRPCPort); err != nil {
+	if err := runGRPCServer(ctx, cfg.GRPCPort, db); err != nil {
 		log.Fatalf("runGRPCServer: %v", err)
 	}
 }
@@ -86,7 +88,7 @@ func runMigrations(migrationDB *sql.DB, migrationsPath string) error {
 	return nil
 }
 
-func runGRPCServer(ctx context.Context, port string) error {
+func runGRPCServer(ctx context.Context, port string, db *sql.DB) error {
 	lis, err := net.Listen("tcp", ":"+port)
 	if err != nil {
 		return fmt.Errorf("net.Listen: %w", err)
@@ -95,7 +97,12 @@ func runGRPCServer(ctx context.Context, port string) error {
 	grpcServer := grpc.NewServer()
 	greeterService := promotiongrpc.NewGreeterService()
 
+	repo := persistence.NewPromoRepository(db)
+	queryHandler := queries.NewGetByCatalogItemHandler(repo)
+	promoService := promotiongrpc.NewPromotionService(queryHandler)
+
 	pb.RegisterGreeterServer(grpcServer, greeterService)
+	pb.RegisterPromotionServiceServer(grpcServer, promoService)
 	reflection.Register(grpcServer)
 
 	go func() {
