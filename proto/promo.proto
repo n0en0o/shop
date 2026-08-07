@@ -13,6 +13,14 @@ service PromotionService {
     //CreatePromo
     rpc CreatePromo(CreatePromoRequest) 
         returns (CreatePromoResponse);
+
+    //UpdatePromo
+    rpc UpdatePromo(UpdatePromoRequest) 
+        returns (UpdatePromoResponse);
+
+    //DeletePromo
+    rpc DeletePromo(DeletePromoRequest)
+        returns (DeletePromoResponse);
 }
 
 message GetPromoByCatalogItemRequest {
@@ -40,4 +48,24 @@ message CreatePromoResponse {
     string id = 1;
     bool success = 2;
     string description = 3;
+}
+
+message UpdatePromoRequest {
+    string id = 1;
+    string title = 2;
+    string value = 3;
+}
+
+message UpdatePromoResponse {
+    bool success = 1;
+    string description = 2;
+}
+
+message DeletePromoRequest {
+    string id = 1;
+}
+
+message DeletePromoResponse {
+    bool success = 1;
+    string description = 2;
 }

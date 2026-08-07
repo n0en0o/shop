@@ -16,6 +16,7 @@ import (
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/mysql"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
+	"github.com/n0en0o/marketplace/internal/promotion/applications/commands"
 	"github.com/n0en0o/marketplace/internal/promotion/applications/queries"
 	"github.com/n0en0o/marketplace/internal/promotion/config"
 	promotiongrpc "github.com/n0en0o/marketplace/internal/promotion/grpc"
@@ -99,7 +100,15 @@ func runGRPCServer(ctx context.Context, port string, db *sql.DB) error {
 
 	repo := persistence.NewPromoRepository(db)
 	queryHandler := queries.NewGetByCatalogItemHandler(repo)
-	promoService := promotiongrpc.NewPromotionService(queryHandler)
+	commandHandler := commands.NewCreatePromoHandler(repo)
+	updateHandler := commands.NewUpdatePromoHandler(repo)
+	deleteHandler := commands.NewDeletePromoHandler(repo)
+	promoService := promotiongrpc.NewPromotionService(
+		queryHandler,
+		commandHandler,
+		updateHandler,
+		deleteHandler,
+	)
 
 	pb.RegisterGreeterServer(grpcServer, greeterService)
 	pb.RegisterPromotionServiceServer(grpcServer, promoService)

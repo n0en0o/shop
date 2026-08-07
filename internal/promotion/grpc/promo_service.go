@@ -14,15 +14,21 @@ type PromotionService struct {
 	pb.UnimplementedPromotionServiceServer
 	queryHandler  *queries.GetByCatalogItemHandler
 	createHandler *commands.CreatePromoHandler
+	updateHandler *commands.UpdatePromoHandler
+	deleteHandler *commands.DeletePromoHandler
 }
 
 func NewPromotionService(
 	queryHandler *queries.GetByCatalogItemHandler,
 	createHandler *commands.CreatePromoHandler,
+	updateHandler *commands.UpdatePromoHandler,
+	deleteHandler *commands.DeletePromoHandler,
 ) *PromotionService {
 	return &PromotionService{
 		queryHandler:  queryHandler,
 		createHandler: createHandler,
+		updateHandler: updateHandler,
+		deleteHandler: deleteHandler,
 	}
 }
 
@@ -73,6 +79,46 @@ func (s *PromotionService) CreatePromo(
 
 	return &pb.CreatePromoResponse{
 		Id:          result.ID,
+		Success:     result.Success,
+		Description: result.Description,
+	}, nil
+}
+
+func (s *PromotionService) UpdatePromo(
+	ctx context.Context,
+	req *pb.UpdatePromoRequest,
+) (*pb.UpdatePromoResponse, error) {
+	cmd := commands.UpdatePromoCommand{
+		ID:    req.Id,
+		Title: req.Title,
+		Value: req.Value,
+	}
+
+	result, err := s.updateHandler.Handle(ctx, cmd)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "internal error: %v", err)
+	}
+
+	return &pb.UpdatePromoResponse{
+		Success:     result.Success,
+		Description: result.Description,
+	}, nil
+}
+
+func (s *PromotionService) DeletePromo(
+	ctx context.Context,
+	req *pb.DeletePromoRequest,
+) (*pb.DeletePromoResponse, error) {
+	cmd := commands.DeletePromoCommand{
+		ID: req.Id,
+	}
+
+	result, err := s.deleteHandler.Handle(ctx, cmd)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "internal error: %v", err)
+	}
+
+	return &pb.DeletePromoResponse{
 		Success:     result.Success,
 		Description: result.Description,
 	}, nil

@@ -37,6 +37,38 @@ func (h *CreatePromoHandler) Handle(
 	ctx context.Context,
 	cmd CreatePromoCommand,
 ) (*CreatePromoResult, error) {
+	if err := validatePromoValue(cmd.Value); err != nil {
+		return &CreatePromoResult{
+			ID:          "",
+			Success:     false,
+			Description: err.Error(),
+		}, nil
+	}
+
+	existing, err := h.repo.FindByCatalogItem(ctx, cmd.CatalogItemID)
+
+	if err != nil {
+		return &CreatePromoResult{
+			ID:          "",
+			Success:     false,
+			Description: fmt.Sprintf("FindByCatalogItem error: %v", err),
+		}, nil
+	}
+
+	if existing != nil {
+		msg := fmt.Sprintf(
+			"promotion is already exists for %s (ID: %s)",
+			cmd.CatalogItemID,
+			existing.ID,
+		)
+
+		return &CreatePromoResult{
+			ID:          existing.ID,
+			Success:     false,
+			Description: msg,
+		}, nil
+	}
+
 	promo := &domain.Promo{
 		ID:            uuid.New().String(),
 		CatalogItemID: cmd.CatalogItemID,

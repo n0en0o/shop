@@ -3,6 +3,8 @@ package persistence
 import (
 	"context"
 	"database/sql"
+	"fmt"
+	"strings"
 
 	"github.com/n0en0o/marketplace/internal/promotion/applications/interfaces"
 	"github.com/n0en0o/marketplace/internal/promotion/domain"
@@ -67,6 +69,11 @@ func (r *PromoRepository) Create(
 		promo.Value,
 	)
 	if err != nil {
+		if strings.Contains(err.Error(), "Duplicate entity") ||
+			strings.Contains(err.Error(), "unique_catalog_item_id") {
+			return false, fmt.Errorf("акция для catalog_item_id (%s) уже существует",
+				promo.CatalogItemID)
+		}
 		return false, err
 	}
 
@@ -76,4 +83,50 @@ func (r *PromoRepository) Create(
 	}
 
 	return rowsAffected > 0, nil
+}
+
+func (r *PromoRepository) Update(
+	ctx context.Context,
+	promo *domain.Promo,
+) (bool, error) {
+	const query = `
+	UPDATE promos SET title = ?, value = ?
+	WHERE id = ?
+	`
+
+	result, err := r.db.ExecContext(
+		ctx,
+		query,
+		promo.Title,
+		promo.Value,
+		promo.ID,
+	)
+	if err != nil {
+		return false, err
+	}
+
+	rows, _ := result.RowsAffected()
+	return rows > 0, nil
+}
+
+func (r *PromoRepository) Delete(
+	ctx context.Context,
+	id string,
+) (bool, error) {
+	const query = `
+	DELETE FROM promos
+	WHERE id = ?
+	`
+
+	result, err := r.db.ExecContext(
+		ctx,
+		query,
+		id,
+	)
+	if err != nil {
+		return false, err
+	}
+
+	rows, _ := result.RowsAffected()
+	return rows > 0, nil
 }
