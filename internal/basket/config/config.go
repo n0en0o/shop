@@ -14,6 +14,8 @@ type Config struct {
 	MigrationsPath string
 	RedisURL       string
 	RedisPassword  string
+	PromotionHost  string
+	PromotionPort  string
 }
 
 func Load() (Config, error) {
@@ -25,6 +27,8 @@ func Load() (Config, error) {
 		MigrationsPath: getEnv("BASKET_MIGRATIONS_PATH", ""),
 		RedisURL:       getEnv("BASKET_REDIS_URL", ""),
 		RedisPassword:  getEnv("BASKET_REDIS_PASSWORD", ""),
+		PromotionHost:  getEnv("BASKET_PROMOTION_HOST", ""),
+		PromotionPort:  getEnv("BASKET_PROMOTION_PORT", ""),
 	}
 
 	if err := cfg.Validate(); err != nil {
@@ -48,6 +52,12 @@ func (c Config) Validate() error {
 	}
 	if strings.TrimSpace(c.RedisPassword) == "" {
 		missing = append(missing, "BASKET_REDIS_PASSWORD")
+	}
+	if strings.TrimSpace(c.PromotionHost) == "" {
+		missing = append(missing, "BASKET_PROMOTION_HOST")
+	}
+	if strings.TrimSpace(c.PromotionPort) == "" {
+		missing = append(missing, "BASKET_PROMOTION_PORT")
 	}
 
 	if len(missing) > 0 {

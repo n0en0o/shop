@@ -8,7 +8,7 @@ services:
     image: postgres:18.1
     environment:
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=12345678
+      - POSTGRES_PASSWORD=123456789
       - POSTGRES_DB=catalog-db-prod
     restart: always
     ports:
@@ -39,7 +39,7 @@ services:
       - CATALOG_PG_PORT=5432
       - CATALOG_PG_DATABASE=catalog-db-prod
       - CATALOG_PG_USER=postgres
-      - CATALOG_PG_PASSWORD=12345678
+      - CATALOG_PG_PASSWORD=123456789
       - CATALOG_PG_SSLMODE=disable
       - CATALOG_MIGRATION_PATH=file:///app/migrations/catalog
     depends_on:
@@ -73,6 +73,52 @@ services:
       timeout: 5s
       retries: 5
       start_period: 30s
+
+  # Promotion services (MySQL + gRPC)
+  promotion_db_prod:
+    container_name: promotion-db-prod
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456789
+      MYSQL_DATABASE: promotion-db
+      MYSQL_CHARACTER_SET_SERVER: utf8mb4
+      MYSQL_COLLATION_SERVER: utf8mb4_unicode_ci
+    restart: always
+    ports:
+      - "9303:3306"
+    volumes:
+      - mysql_promotion_prod:/var/lib/mysql
+    networks:
+      - marketplace-prod-net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p123456789"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+
+  promotion-grpc:
+    container_name: promotion-grpc
+    build:
+      context: .
+      dockerfile: cmd/promotion/DockerFile
+    ports:
+      - "9203:7003"
+    networks:
+      - marketplace-prod-net
+    environment:
+      - PROMOTION_DATABASE_URL=root:123456789@tcp(promotion_db_prod:3306)/promotion-db?parseTime=true&multiStatements=true
+      - PROMOTION_MIGRATIONS_PATH=file:///app/migrations/promotion
+      - PROMOTION_GRPC_PORT=7003
+    depends_on:
+      promotion_db_prod:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 7003 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
   
   basket-api:
     container_name: basket-api
@@ -89,11 +135,16 @@ services:
       - BASKET_MIGRATIONS_PATH=file://migrations/basket
       - BASKET_REDIS_URL=basket-cache-redis-prod:6379
       - BASKET_REDIS_PASSWORD=123456789
+      # gRPC Promotion service
+      - BASKET_PROMOTION_HOST=promotion-grpc
+      - BASKET_PROMOTION_PORT=7003
     depends_on:
       basket-db-prod:
         condition: service_healthy
       basket-cache-redis-prod:
-        condition: service_started
+        condition: service_healthy
+      promotion-grpc:
+        condition: service_healthy
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost:7002/health || exit 1"]
@@ -113,11 +164,18 @@ services:
       - redis-basket-prod:/data 
     networks:
       - marketplace-prod-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "123456789", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
 
 volumes:
   postgres-catalog-prod:
   postgres-basket-prod:
   redis-basket-prod:
+  mysql_promotion_prod:
 
 networks:
   marketplace-prod-net:

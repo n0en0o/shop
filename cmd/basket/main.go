@@ -4,8 +4,10 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
@@ -21,8 +23,11 @@ import (
 	"github.com/n0en0o/marketplace/internal/basket/domain/repositories"
 	"github.com/n0en0o/marketplace/internal/basket/infrastructure/cache"
 	"github.com/n0en0o/marketplace/internal/basket/infrastructure/persistence"
+	promotionpb "github.com/n0en0o/marketplace/internal/promotion/grpc/pb"
 	"github.com/n0en0o/marketplace/internal/shared"
 	"github.com/redis/go-redis/v9"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 func main() {
@@ -37,11 +42,10 @@ func main() {
 	}
 	defer db.Close()
 
-	if err := db.Ping(); err != nil {
+	if err := shared.WaitForDB(db, 30, 2*time.Second); err != nil {
 		log.Fatal("can't connect to db: ", err)
 	}
 
-	log.Println("connected to basket db successfully")
 	driver, err := postgres.WithInstance(db, &postgres.Config{})
 	if err != nil {
 		log.Fatal("migrate driver: ", err)
@@ -71,15 +75,34 @@ func main() {
 	log.Println("redis connected")
 	defer redisClient.Close()
 
+	promotionAddr := fmt.Sprintf("%s:%s", cfg.PromotionHost, cfg.PromotionPort)
+
+	grpcConn, err := grpc.NewClient(
+		promotionAddr,
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
+	if err != nil {
+		log.Printf("warning: failed to connect to promotion service: %v", err)
+	} else {
+		defer grpcConn.Close()
+		log.Printf("promotion grpc client connected to %s", promotionAddr)
+	}
+
+	var promoClient promotionpb.PromotionServiceClient
+	if grpcConn != nil {
+		promoClient = promotionpb.NewPromotionServiceClient(grpcConn)
+	}
+
 	pgRepo := persistence.NewCartRepository(db)
 	var repo repositories.CartRepository = cache.NewRedisCartRepository(
 		pgRepo,
 		redisClient,
 	)
 
-	saveCartHandler := commands.NewSaveCartHandler(repo)
+	saveCartHandler := commands.NewSaveCartHandler(repo, promoClient)
 	getCartHandler := queries.NewGetCartHandler(repo)
 	removeCartHandler := commands.NewRemoveCartHandler(repo)
+
 	cartHandler := handlers.NewCartHandler(
 		saveCartHandler,
 		getCartHandler,

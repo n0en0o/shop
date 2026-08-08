@@ -22,7 +22,10 @@ import (
 	promotiongrpc "github.com/n0en0o/marketplace/internal/promotion/grpc"
 	"github.com/n0en0o/marketplace/internal/promotion/grpc/pb"
 	"github.com/n0en0o/marketplace/internal/promotion/infrastructure/persistence"
+	"github.com/n0en0o/marketplace/internal/shared"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/health"
+	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
 )
 
@@ -63,9 +66,9 @@ func openDB(dsn string) (*sql.DB, error) {
 	db.SetConnMaxLifetime(5 * time.Minute)
 	db.SetConnMaxIdleTime(2 * time.Minute)
 
-	if err := db.Ping(); err != nil {
+	if err := shared.WaitForDB(db, 30, 2*time.Second); err != nil {
 		db.Close()
-		return nil, fmt.Errorf("sql.Ping: %w", err)
+		return nil, fmt.Errorf("WaitForDB: %w", err)
 	}
 
 	return db, nil
@@ -112,6 +115,11 @@ func runGRPCServer(ctx context.Context, port string, db *sql.DB) error {
 
 	pb.RegisterGreeterServer(grpcServer, greeterService)
 	pb.RegisterPromotionServiceServer(grpcServer, promoService)
+
+	healthServer := health.NewServer()
+	healthpb.RegisterHealthServer(grpcServer, healthServer)
+	healthServer.SetServingStatus("", healthpb.HealthCheckResponse_SERVING)
+
 	reflection.Register(grpcServer)
 
 	go func() {

@@ -1,5 +1,8 @@
 {
     "cSpell.words": [
-        "promotiongrpc"
+        "gonic",
+        "promotiongrpc",
+        "promotionpb",
+        "SSLMODE"
     ]
 }

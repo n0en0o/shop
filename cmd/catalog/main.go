@@ -5,6 +5,7 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
@@ -19,6 +20,7 @@ import (
 	"github.com/n0en0o/marketplace/internal/catalog/applications/queries"
 	"github.com/n0en0o/marketplace/internal/catalog/config"
 	"github.com/n0en0o/marketplace/internal/catalog/infrastructure/persistence"
+	"github.com/n0en0o/marketplace/internal/shared"
 )
 
 func main() {
@@ -33,11 +35,10 @@ func main() {
 	}
 	defer db.Close()
 
-	if err := db.Ping(); err != nil {
+	if err := shared.WaitForDB(db, 30, 2*time.Second); err != nil {
 		log.Fatal("can't connect to db: ", err)
 	}
 
-	log.Println("connected to db successfully")
 	driver, err := postgres.WithInstance(db, &postgres.Config{})
 	if err != nil {
 		log.Fatal("postgres.WithInstance: ", err)
