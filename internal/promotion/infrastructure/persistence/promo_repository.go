@@ -71,8 +71,10 @@ func (r *PromoRepository) Create(
 	if err != nil {
 		if strings.Contains(err.Error(), "Duplicate entity") ||
 			strings.Contains(err.Error(), "unique_catalog_item_id") {
-			return false, fmt.Errorf("акция для catalog_item_id (%s) уже существует",
-				promo.CatalogItemID)
+			return false, fmt.Errorf("%w: catalog_item_id %s",
+				domain.ErrPromoAlreadyExists,
+				promo.CatalogItemID,
+			)
 		}
 		return false, err
 	}

@@ -33,10 +33,7 @@ func (h *UpdatePromoHandler) Handle(
 	cmd UpdatePromoCommand,
 ) (*UpdatePromoResult, error) {
 	if err := validatePromoValue(cmd.Value); err != nil {
-		return &UpdatePromoResult{
-			Success:     false,
-			Description: err.Error(),
-		}, nil
+		return nil, err
 	}
 
 	promo := &domain.Promo{

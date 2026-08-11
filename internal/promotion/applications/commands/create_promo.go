@@ -2,6 +2,7 @@ package commands
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/google/uuid"
@@ -38,35 +39,17 @@ func (h *CreatePromoHandler) Handle(
 	cmd CreatePromoCommand,
 ) (*CreatePromoResult, error) {
 	if err := validatePromoValue(cmd.Value); err != nil {
-		return &CreatePromoResult{
-			ID:          "",
-			Success:     false,
-			Description: err.Error(),
-		}, nil
+		return nil, err
 	}
 
 	existing, err := h.repo.FindByCatalogItem(ctx, cmd.CatalogItemID)
 
 	if err != nil {
-		return &CreatePromoResult{
-			ID:          "",
-			Success:     false,
-			Description: fmt.Sprintf("FindByCatalogItem error: %v", err),
-		}, nil
+		return nil, fmt.Errorf("find promotion by catalog item: %w", err)
 	}
 
 	if existing != nil {
-		msg := fmt.Sprintf(
-			"promotion is already exists for %s (ID: %s)",
-			cmd.CatalogItemID,
-			existing.ID,
-		)
-
-		return &CreatePromoResult{
-			ID:          existing.ID,
-			Success:     false,
-			Description: msg,
-		}, nil
+		return nil, domain.ErrPromoAlreadyExists
 	}
 
 	promo := &domain.Promo{
@@ -78,11 +61,10 @@ func (h *CreatePromoHandler) Handle(
 
 	success, err := h.repo.Create(ctx, promo)
 	if err != nil {
-		return &CreatePromoResult{
-			ID:          "",
-			Success:     false,
-			Description: fmt.Sprintf("Failed to create promotion: %v", err),
-		}, nil
+		if errors.Is(err, domain.ErrPromoAlreadyExists) {
+			return nil, err
+		}
+		return nil, fmt.Errorf("create promotion: %w", err)
 	}
 
 	description := "Failed to create promotion"

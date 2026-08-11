@@ -2,9 +2,11 @@ package grpc
 
 import (
 	"context"
+	"errors"
 
 	"github.com/n0en0o/marketplace/internal/promotion/applications/commands"
 	"github.com/n0en0o/marketplace/internal/promotion/applications/queries"
+	"github.com/n0en0o/marketplace/internal/promotion/domain"
 	"github.com/n0en0o/marketplace/internal/promotion/grpc/pb"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -42,7 +44,7 @@ func (s *PromotionService) GetPromoByCatalogItem(
 
 	p, err := s.queryHandler.Handle(ctx, query)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "internal error: %v", err)
+		return nil, promoErrorStatus(err)
 	}
 
 	if p == nil {
@@ -74,7 +76,7 @@ func (s *PromotionService) CreatePromo(
 
 	result, err := s.createHandler.Handle(ctx, cmd)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "internal error: %v", err)
+		return nil, promoErrorStatus(err)
 	}
 
 	return &pb.CreatePromoResponse{
@@ -96,7 +98,7 @@ func (s *PromotionService) UpdatePromo(
 
 	result, err := s.updateHandler.Handle(ctx, cmd)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "internal error: %v", err)
+		return nil, promoErrorStatus(err)
 	}
 
 	return &pb.UpdatePromoResponse{
@@ -115,11 +117,22 @@ func (s *PromotionService) DeletePromo(
 
 	result, err := s.deleteHandler.Handle(ctx, cmd)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "internal error: %v", err)
+		return nil, promoErrorStatus(err)
 	}
 
 	return &pb.DeletePromoResponse{
 		Success:     result.Success,
 		Description: result.Description,
 	}, nil
+}
+
+func promoErrorStatus(err error) error {
+	switch {
+	case errors.Is(err, commands.ErrInvalidPromoValue):
+		return status.Error(codes.InvalidArgument, "invalid promo value")
+	case errors.Is(err, domain.ErrPromoAlreadyExists):
+		return status.Error(codes.AlreadyExists, "promotion already exists")
+	default:
+		return status.Error(codes.Internal, "internal error")
+	}
 }
