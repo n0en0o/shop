@@ -41,9 +41,7 @@ func (h *SaveCartHandler) Handle(
 		return "", err
 	}
 
-	if h.promoClient != nil {
-		_ = h.applyDiscountsToCart(ctx, &cmd.Cart)
-	}
+	_ = h.applyDiscountsToCart(ctx, &cmd.Cart)
 
 	_, err := h.repo.Save(ctx, cmd.Cart)
 	if err != nil {
@@ -75,6 +73,13 @@ func (h *SaveCartHandler) applyDiscountsToCart(
 ) error {
 	for i := range cart.Items {
 		item := &cart.Items[i]
+		item.Discount = 0
+		item.FinalPrice = item.UnitPrice
+
+		if h.promoClient == nil {
+			continue
+		}
+
 		disc, err := h.getDiscountForItem(ctx, item)
 		if err != nil {
 			continue
@@ -84,8 +89,15 @@ func (h *SaveCartHandler) applyDiscountsToCart(
 			continue
 		}
 
-		item.UnitPrice -= val
+		if val < 0 {
+			continue
+		}
+		if val > item.UnitPrice {
+			val = item.UnitPrice
+		}
 
+		item.Discount = val
+		item.FinalPrice = item.UnitPrice - val
 	}
 
 	return nil

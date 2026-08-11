@@ -55,13 +55,17 @@ func (r *CartRepository) Save(
 				item_id,
 				quantity,
 				unit_price,
+				discount,
+				final_price,
 				item_title,
 				item_note
-			) VALUES ($1, $2, $3, $4, $5, $6)`,
+			) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
 			cart.AccountName,
 			item.ItemID,
 			item.Quantity,
 			item.UnitPrice,
+			item.Discount,
+			item.FinalPrice,
 			item.ItemTitle,
 			item.ItemNote,
 		)
@@ -100,7 +104,7 @@ func (r *CartRepository) Get(
 
 	rows, err := r.db.QueryContext(
 		ctx,
-		`SELECT item_id, quantity, unit_price, item_title, item_note
+		`SELECT item_id, quantity, unit_price, discount, final_price, item_title, item_note
 		FROM shopping_cart_items
 		WHERE account_name = $1`,
 		accountName,
@@ -117,6 +121,8 @@ func (r *CartRepository) Get(
 			&item.ItemID,
 			&item.Quantity,
 			&item.UnitPrice,
+			&item.Discount,
+			&item.FinalPrice,
 			&item.ItemTitle,
 			&item.ItemNote,
 		)
