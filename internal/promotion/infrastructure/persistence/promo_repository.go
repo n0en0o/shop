@@ -3,12 +3,15 @@ package persistence
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
-	"strings"
 
+	"github.com/go-sql-driver/mysql"
 	"github.com/n0en0o/marketplace/internal/promotion/applications/interfaces"
 	"github.com/n0en0o/marketplace/internal/promotion/domain"
 )
+
+const mysqlDuplicateEntryCode uint16 = 1062
 
 type PromoRepository struct {
 	db *sql.DB
@@ -69,8 +72,8 @@ func (r *PromoRepository) Create(
 		promo.Value,
 	)
 	if err != nil {
-		if strings.Contains(err.Error(), "Duplicate entity") ||
-			strings.Contains(err.Error(), "unique_catalog_item_id") {
+		var myErr *mysql.MySQLError
+		if errors.As(err, &myErr) && myErr.Number == mysqlDuplicateEntryCode {
 			return false, fmt.Errorf("%w: catalog_item_id %s",
 				domain.ErrPromoAlreadyExists,
 				promo.CatalogItemID,

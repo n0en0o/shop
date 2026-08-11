@@ -42,16 +42,6 @@ func (h *CreatePromoHandler) Handle(
 		return nil, err
 	}
 
-	existing, err := h.repo.FindByCatalogItem(ctx, cmd.CatalogItemID)
-
-	if err != nil {
-		return nil, fmt.Errorf("find promotion by catalog item: %w", err)
-	}
-
-	if existing != nil {
-		return nil, domain.ErrPromoAlreadyExists
-	}
-
 	promo := &domain.Promo{
 		ID:            uuid.New().String(),
 		CatalogItemID: cmd.CatalogItemID,
