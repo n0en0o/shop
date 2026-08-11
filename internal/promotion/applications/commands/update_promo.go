@@ -10,7 +10,7 @@ import (
 type UpdatePromoCommand struct {
 	ID    string
 	Title string
-	Value string
+	Value float64
 }
 
 type UpdatePromoResult struct {
@@ -47,9 +47,9 @@ func (h *UpdatePromoHandler) Handle(
 		return nil, err
 	}
 
-	desc := "обновлено"
+	desc := "Акция обновлена"
 	if !success {
-		desc = "ошибка при обновления"
+		desc = "Акция не найдена"
 	}
 
 	return &UpdatePromoResult{

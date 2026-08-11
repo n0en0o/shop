@@ -49,7 +49,7 @@ func (s *PromotionService) GetPromoByCatalogItem(
 	}
 
 	if p == nil {
-		return nil, status.Error(codes.NotFound, "promotion not found")
+		return nil, status.Error(codes.NotFound, "акция не найдена")
 	}
 
 	return &pb.GetPromoByCatalogItemResponse{
@@ -127,12 +127,12 @@ func (s *PromotionService) DeletePromo(
 func promoErrorStatus(err error) error {
 	switch {
 	case errors.Is(err, commands.ErrInvalidPromoValue):
-		return status.Error(codes.InvalidArgument, "invalid promo value")
+		return status.Error(codes.InvalidArgument, "некорректное значение скидки")
 	case errors.Is(err, domain.ErrPromoAlreadyExists):
-		return status.Error(codes.AlreadyExists, "promotion already exists")
+		return status.Error(codes.AlreadyExists, "акция уже существует")
 	case errors.Is(err, repositories.ErrPromoNotFound):
-		return status.Error(codes.NotFound, "promotion not found")
+		return status.Error(codes.NotFound, "акция не найдена")
 	default:
-		return status.Error(codes.Internal, "internal error")
+		return status.Error(codes.Internal, "внутренняя ошибка сервера")
 	}
 }

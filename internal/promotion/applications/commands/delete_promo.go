@@ -34,9 +34,9 @@ func (h *DeletePromoHandler) Handle(
 		return nil, err
 	}
 
-	desc := "удалено"
+	desc := "Акция удалена"
 	if !success {
-		desc = "ошибка при удалении"
+		desc = "Акция не найдена"
 	}
 
 	return &DeletePromoResult{

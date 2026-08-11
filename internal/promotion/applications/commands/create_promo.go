@@ -13,7 +13,7 @@ import (
 type CreatePromoCommand struct {
 	CatalogItemID string
 	Title         string
-	Value         string
+	Value         float64
 }
 
 type CreatePromoResult struct {
@@ -57,9 +57,9 @@ func (h *CreatePromoHandler) Handle(
 		return nil, fmt.Errorf("create promotion: %w", err)
 	}
 
-	description := "Failed to create promotion"
+	description := "Акция не создана"
 	if success {
-		description = "Promotion created successfully"
+		description = "Акция создана успешно"
 	}
 
 	return &CreatePromoResult{

@@ -2,9 +2,8 @@ package commands
 
 import (
 	"context"
-	"fmt"
-	"strconv"
-	"strings"
+	"errors"
+	"math"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/n0en0o/marketplace/internal/basket/domain"
@@ -13,6 +12,8 @@ import (
 )
 
 var validate = validator.New()
+
+var errInvalidPromoValue = errors.New("некорректное значение скидки")
 
 type SaveCartCommand struct {
 	Cart domain.ShoppingCart `json:"cart" validate:"required"`
@@ -84,7 +85,7 @@ func (h *SaveCartHandler) applyDiscountsToCart(
 		if err != nil {
 			continue
 		}
-		val, err := parseDiscountValue(disc)
+		val, err := discountValue(disc)
 		if err != nil {
 			continue
 		}
@@ -103,14 +104,13 @@ func (h *SaveCartHandler) applyDiscountsToCart(
 	return nil
 }
 
-func parseDiscountValue(
+func discountValue(
 	d *pb.GetPromoByCatalogItemResponse,
 ) (float64, error) {
-	value := strings.TrimSpace(d.GetPromotion().GetValue())
-	f, err := strconv.ParseFloat(value, 64)
-	if err != nil {
-		return 0, fmt.Errorf("invalid promo value %q: %v", value, err)
+	value := d.GetPromotion().GetValue()
+	if math.IsNaN(value) || math.IsInf(value, 0) || value < 0 {
+		return 0, errInvalidPromoValue
 	}
 
-	return f, nil
+	return value, nil
 }

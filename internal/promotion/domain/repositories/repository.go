@@ -7,7 +7,7 @@ import (
 	"github.com/n0en0o/marketplace/internal/promotion/domain"
 )
 
-var ErrPromoNotFound = errors.New("promotion not found")
+var ErrPromoNotFound = errors.New("акция не найдена")
 
 type PromotionRepository interface {
 	FindByCatalogItem(ctx context.Context, catalogItemID string) (*domain.Promo, error)

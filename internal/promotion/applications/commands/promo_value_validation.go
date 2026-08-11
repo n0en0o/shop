@@ -4,22 +4,19 @@ import (
 	"errors"
 	"fmt"
 	"math"
-	"strconv"
-	"strings"
 )
 
 var (
-	ErrInvalidPromoValue  = errors.New("invalid promo value")
-	errNegativePromoValue = errors.New("promo value cannot be negative")
+	ErrInvalidPromoValue  = errors.New("некорректное значение скидки")
+	errNegativePromoValue = errors.New("значение скидки не может быть отрицательным")
 )
 
-func validatePromoValue(value string) error {
-	amount, err := strconv.ParseFloat(strings.TrimSpace(value), 64)
-	if err != nil || math.IsNaN(amount) || math.IsInf(amount, 0) {
-		return fmt.Errorf("%w: value must be a valid number", ErrInvalidPromoValue)
+func validatePromoValue(value float64) error {
+	if math.IsNaN(value) || math.IsInf(value, 0) {
+		return fmt.Errorf("%w: значение должно быть числом", ErrInvalidPromoValue)
 	}
 
-	if amount < 0 {
+	if value < 0 {
 		return fmt.Errorf("%w: %v", ErrInvalidPromoValue, errNegativePromoValue)
 	}
 

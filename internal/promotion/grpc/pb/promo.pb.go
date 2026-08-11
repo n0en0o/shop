@@ -114,7 +114,7 @@ type Promotion struct {
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	CatalogItemId string                 `protobuf:"bytes,2,opt,name=catalog_item_id,json=catalogItemId,proto3" json:"catalog_item_id,omitempty"`
 	Title         string                 `protobuf:"bytes,3,opt,name=title,proto3" json:"title,omitempty"`
-	Value         string                 `protobuf:"bytes,4,opt,name=value,proto3" json:"value,omitempty"`
+	Value         float64                `protobuf:"fixed64,4,opt,name=value,proto3" json:"value,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -170,18 +170,18 @@ func (x *Promotion) GetTitle() string {
 	return ""
 }
 
-func (x *Promotion) GetValue() string {
+func (x *Promotion) GetValue() float64 {
 	if x != nil {
 		return x.Value
 	}
-	return ""
+	return 0
 }
 
 type CreatePromoRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	CatalogItemId string                 `protobuf:"bytes,1,opt,name=catalog_item_id,json=catalogItemId,proto3" json:"catalog_item_id,omitempty"`
 	Title         string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
-	Value         string                 `protobuf:"bytes,3,opt,name=value,proto3" json:"value,omitempty"`
+	Value         float64                `protobuf:"fixed64,3,opt,name=value,proto3" json:"value,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -230,11 +230,11 @@ func (x *CreatePromoRequest) GetTitle() string {
 	return ""
 }
 
-func (x *CreatePromoRequest) GetValue() string {
+func (x *CreatePromoRequest) GetValue() float64 {
 	if x != nil {
 		return x.Value
 	}
-	return ""
+	return 0
 }
 
 type CreatePromoResponse struct {
@@ -301,7 +301,7 @@ type UpdatePromoRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Title         string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
-	Value         string                 `protobuf:"bytes,3,opt,name=value,proto3" json:"value,omitempty"`
+	Value         float64                `protobuf:"fixed64,3,opt,name=value,proto3" json:"value,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -350,11 +350,11 @@ func (x *UpdatePromoRequest) GetTitle() string {
 	return ""
 }
 
-func (x *UpdatePromoRequest) GetValue() string {
+func (x *UpdatePromoRequest) GetValue() float64 {
 	if x != nil {
 		return x.Value
 	}
-	return ""
+	return 0
 }
 
 type UpdatePromoResponse struct {
@@ -518,11 +518,11 @@ const file_promo_proto_rawDesc = "" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12&\n" +
 	"\x0fcatalog_item_id\x18\x02 \x01(\tR\rcatalogItemId\x12\x14\n" +
 	"\x05title\x18\x03 \x01(\tR\x05title\x12\x14\n" +
-	"\x05value\x18\x04 \x01(\tR\x05value\"h\n" +
+	"\x05value\x18\x04 \x01(\x01R\x05value\"h\n" +
 	"\x12CreatePromoRequest\x12&\n" +
 	"\x0fcatalog_item_id\x18\x01 \x01(\tR\rcatalogItemId\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12\x14\n" +
-	"\x05value\x18\x03 \x01(\tR\x05value\"a\n" +
+	"\x05value\x18\x03 \x01(\x01R\x05value\"a\n" +
 	"\x13CreatePromoResponse\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x18\n" +
 	"\asuccess\x18\x02 \x01(\bR\asuccess\x12 \n" +
@@ -530,7 +530,7 @@ const file_promo_proto_rawDesc = "" +
 	"\x12UpdatePromoRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12\x14\n" +
-	"\x05value\x18\x03 \x01(\tR\x05value\"Q\n" +
+	"\x05value\x18\x03 \x01(\x01R\x05value\"Q\n" +
 	"\x13UpdatePromoResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12 \n" +
 	"\vdescription\x18\x02 \x01(\tR\vdescription\"$\n" +
