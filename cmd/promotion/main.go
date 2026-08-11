@@ -19,7 +19,7 @@ import (
 	"github.com/n0en0o/marketplace/internal/promotion/applications/commands"
 	"github.com/n0en0o/marketplace/internal/promotion/applications/queries"
 	"github.com/n0en0o/marketplace/internal/promotion/config"
-	promotiongrpc "github.com/n0en0o/marketplace/internal/promotion/grpc"
+	"github.com/n0en0o/marketplace/internal/promotion/grpc"
 	"github.com/n0en0o/marketplace/internal/promotion/grpc/pb"
 	"github.com/n0en0o/marketplace/internal/promotion/infrastructure/persistence"
 	"github.com/n0en0o/marketplace/internal/shared"
