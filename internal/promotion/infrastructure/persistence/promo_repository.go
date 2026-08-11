@@ -110,8 +110,15 @@ func (r *PromoRepository) Update(
 		return false, err
 	}
 
-	rows, _ := result.RowsAffected()
-	return rows > 0, nil
+	rows, err := result.RowsAffected()
+	if err != nil {
+		return false, err
+	}
+	if rows > 0 {
+		return true, nil
+	}
+
+	return r.exists(ctx, promo.ID)
 }
 
 func (r *PromoRepository) Delete(
@@ -132,6 +139,27 @@ func (r *PromoRepository) Delete(
 		return false, err
 	}
 
-	rows, _ := result.RowsAffected()
+	rows, err := result.RowsAffected()
+	if err != nil {
+		return false, err
+	}
+
 	return rows > 0, nil
+}
+
+func (r *PromoRepository) exists(ctx context.Context, id string) (bool, error) {
+	var exists int
+	err := r.db.QueryRowContext(
+		ctx,
+		`SELECT EXISTS(
+			SELECT 1 FROM promos
+			WHERE id = ?
+		)`,
+		id,
+	).Scan(&exists)
+	if err != nil {
+		return false, err
+	}
+
+	return exists > 0, nil
 }
