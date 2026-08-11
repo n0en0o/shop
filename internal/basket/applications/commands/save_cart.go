@@ -94,7 +94,7 @@ func (h *SaveCartHandler) applyDiscountsToCart(
 func parseDiscountValue(
 	d *pb.GetPromoByCatalogItemResponse,
 ) (float64, error) {
-	value := strings.TrimSpace(d.Promotion.Value)
+	value := strings.TrimSpace(d.GetPromotion().GetValue())
 	f, err := strconv.ParseFloat(value, 64)
 	if err != nil {
 		return 0, fmt.Errorf("invalid promo value %q: %v", value, err)
