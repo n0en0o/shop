@@ -1,10 +1,13 @@
-package interfaces
+package repositories
 
 import (
 	"context"
+	"errors"
 
 	"github.com/n0en0o/marketplace/internal/promotion/domain"
 )
+
+var ErrPromoNotFound = errors.New("promotion not found")
 
 type PromotionRepository interface {
 	FindByCatalogItem(ctx context.Context, catalogItemID string) (*domain.Promo, error)

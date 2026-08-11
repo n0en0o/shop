@@ -6,8 +6,8 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
-	"github.com/n0en0o/marketplace/internal/promotion/applications/interfaces"
 	"github.com/n0en0o/marketplace/internal/promotion/domain"
+	"github.com/n0en0o/marketplace/internal/promotion/domain/repositories"
 )
 
 type CreatePromoCommand struct {
@@ -23,11 +23,11 @@ type CreatePromoResult struct {
 }
 
 type CreatePromoHandler struct {
-	repo interfaces.PromotionRepository
+	repo repositories.PromotionRepository
 }
 
 func NewCreatePromoHandler(
-	repo interfaces.PromotionRepository,
+	repo repositories.PromotionRepository,
 ) *CreatePromoHandler {
 	return &CreatePromoHandler{
 		repo: repo,

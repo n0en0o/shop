@@ -3,8 +3,8 @@ package commands
 import (
 	"context"
 
-	"github.com/n0en0o/marketplace/internal/promotion/applications/interfaces"
 	"github.com/n0en0o/marketplace/internal/promotion/domain"
+	"github.com/n0en0o/marketplace/internal/promotion/domain/repositories"
 )
 
 type UpdatePromoCommand struct {
@@ -19,11 +19,11 @@ type UpdatePromoResult struct {
 }
 
 type UpdatePromoHandler struct {
-	repo interfaces.PromotionRepository
+	repo repositories.PromotionRepository
 }
 
 func NewUpdatePromoHandler(
-	repo interfaces.PromotionRepository,
+	repo repositories.PromotionRepository,
 ) *UpdatePromoHandler {
 	return &UpdatePromoHandler{repo: repo}
 }

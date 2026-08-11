@@ -7,6 +7,7 @@ import (
 	"github.com/n0en0o/marketplace/internal/promotion/applications/commands"
 	"github.com/n0en0o/marketplace/internal/promotion/applications/queries"
 	"github.com/n0en0o/marketplace/internal/promotion/domain"
+	"github.com/n0en0o/marketplace/internal/promotion/domain/repositories"
 	"github.com/n0en0o/marketplace/internal/promotion/grpc/pb"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -48,10 +49,7 @@ func (s *PromotionService) GetPromoByCatalogItem(
 	}
 
 	if p == nil {
-		return nil, status.Errorf(
-			codes.NotFound,
-			"ничего для %s не найдено", req.CatalogItemId,
-		)
+		return nil, status.Error(codes.NotFound, "promotion not found")
 	}
 
 	return &pb.GetPromoByCatalogItemResponse{
@@ -132,6 +130,8 @@ func promoErrorStatus(err error) error {
 		return status.Error(codes.InvalidArgument, "invalid promo value")
 	case errors.Is(err, domain.ErrPromoAlreadyExists):
 		return status.Error(codes.AlreadyExists, "promotion already exists")
+	case errors.Is(err, repositories.ErrPromoNotFound):
+		return status.Error(codes.NotFound, "promotion not found")
 	default:
 		return status.Error(codes.Internal, "internal error")
 	}

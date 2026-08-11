@@ -7,8 +7,8 @@ import (
 	"fmt"
 
 	"github.com/go-sql-driver/mysql"
-	"github.com/n0en0o/marketplace/internal/promotion/applications/interfaces"
 	"github.com/n0en0o/marketplace/internal/promotion/domain"
+	"github.com/n0en0o/marketplace/internal/promotion/domain/repositories"
 )
 
 const mysqlDuplicateEntryCode uint16 = 1062
@@ -17,7 +17,7 @@ type PromoRepository struct {
 	db *sql.DB
 }
 
-func NewPromoRepository(db *sql.DB) interfaces.PromotionRepository {
+func NewPromoRepository(db *sql.DB) repositories.PromotionRepository {
 	return &PromoRepository{db: db}
 }
 
@@ -43,8 +43,8 @@ func (r *PromoRepository) FindByCatalogItem(
 		&p.Title,
 		&p.Value,
 	)
-	if err == sql.ErrNoRows {
-		return nil, nil
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, repositories.ErrPromoNotFound
 	}
 
 	if err != nil {

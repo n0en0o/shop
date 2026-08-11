@@ -3,7 +3,7 @@ package commands
 import (
 	"context"
 
-	"github.com/n0en0o/marketplace/internal/promotion/applications/interfaces"
+	"github.com/n0en0o/marketplace/internal/promotion/domain/repositories"
 )
 
 type DeletePromoCommand struct {
@@ -16,11 +16,11 @@ type DeletePromoResult struct {
 }
 
 type DeletePromoHandler struct {
-	repo interfaces.PromotionRepository
+	repo repositories.PromotionRepository
 }
 
 func NewDeletePromoHandler(
-	repo interfaces.PromotionRepository,
+	repo repositories.PromotionRepository,
 ) *DeletePromoHandler {
 	return &DeletePromoHandler{repo: repo}
 }

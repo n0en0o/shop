@@ -3,8 +3,8 @@ package queries
 import (
 	"context"
 
-	"github.com/n0en0o/marketplace/internal/promotion/applications/interfaces"
 	"github.com/n0en0o/marketplace/internal/promotion/domain"
+	"github.com/n0en0o/marketplace/internal/promotion/domain/repositories"
 )
 
 type GetByCatalogItemQuery struct {
@@ -12,11 +12,11 @@ type GetByCatalogItemQuery struct {
 }
 
 type GetByCatalogItemHandler struct {
-	repo interfaces.PromotionRepository
+	repo repositories.PromotionRepository
 }
 
 func NewGetByCatalogItemHandler(
-	repo interfaces.PromotionRepository,
+	repo repositories.PromotionRepository,
 ) *GetByCatalogItemHandler {
 	return &GetByCatalogItemHandler{
 		repo: repo,
