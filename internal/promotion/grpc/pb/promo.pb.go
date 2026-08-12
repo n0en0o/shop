@@ -543,7 +543,7 @@ const file_promo_proto_rawDesc = "" +
 	"\x15GetPromoByCatalogItem\x12'.promotion.GetPromoByCatalogItemRequest\x1a(.promotion.GetPromoByCatalogItemResponse\x12L\n" +
 	"\vCreatePromo\x12\x1d.promotion.CreatePromoRequest\x1a\x1e.promotion.CreatePromoResponse\x12L\n" +
 	"\vUpdatePromo\x12\x1d.promotion.UpdatePromoRequest\x1a\x1e.promotion.UpdatePromoResponse\x12L\n" +
-	"\vDeletePromo\x12\x1d.promotion.DeletePromoRequest\x1a\x1e.promotion.DeletePromoResponseB:Z8github.com/n0en0o/marketplace/internal/promotion/grpc/pbb\x06proto3"
+	"\vDeletePromo\x12\x1d.promotion.DeletePromoRequest\x1a\x1e.promotion.DeletePromoResponseB3Z1github.com/n0en0o/shop/internal/promotion/grpc/pbb\x06proto3"
 
 var (
 	file_promo_proto_rawDescOnce sync.Once

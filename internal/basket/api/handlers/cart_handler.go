@@ -5,9 +5,9 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/n0en0o/marketplace/internal/basket/applications/commands"
-	"github.com/n0en0o/marketplace/internal/basket/applications/queries"
-	"github.com/n0en0o/marketplace/internal/basket/domain"
+	"github.com/n0en0o/shop/internal/basket/applications/commands"
+	"github.com/n0en0o/shop/internal/basket/applications/queries"
+	"github.com/n0en0o/shop/internal/basket/domain"
 )
 
 type CartHandler struct {

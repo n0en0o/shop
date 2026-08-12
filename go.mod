@@ -1,4 +1,4 @@
-module github.com/n0en0o/marketplace
+module github.com/n0en0o/shop
 
 go 1.25.0
 

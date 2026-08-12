@@ -4,8 +4,8 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/n0en0o/marketplace/internal/basket/domain"
-	"github.com/n0en0o/marketplace/internal/shared"
+	"github.com/n0en0o/shop/internal/basket/domain"
+	"github.com/n0en0o/shop/internal/shared"
 )
 
 type CartRepository struct {

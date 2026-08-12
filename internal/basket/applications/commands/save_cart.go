@@ -6,9 +6,9 @@ import (
 	"math"
 
 	"github.com/go-playground/validator/v10"
-	"github.com/n0en0o/marketplace/internal/basket/domain"
-	"github.com/n0en0o/marketplace/internal/basket/domain/repositories"
-	"github.com/n0en0o/marketplace/internal/promotion/grpc/pb"
+	"github.com/n0en0o/shop/internal/basket/domain"
+	"github.com/n0en0o/shop/internal/basket/domain/repositories"
+	"github.com/n0en0o/shop/internal/promotion/grpc/pb"
 )
 
 var validate = validator.New()

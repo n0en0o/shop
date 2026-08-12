@@ -7,8 +7,8 @@ import (
 	"log"
 	"time"
 
-	"github.com/n0en0o/marketplace/internal/basket/domain"
-	"github.com/n0en0o/marketplace/internal/basket/domain/repositories"
+	"github.com/n0en0o/shop/internal/basket/domain"
+	"github.com/n0en0o/shop/internal/basket/domain/repositories"
 	"github.com/redis/go-redis/v9"
 )
 

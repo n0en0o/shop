@@ -4,11 +4,11 @@ import (
 	"context"
 	"errors"
 
-	"github.com/n0en0o/marketplace/internal/promotion/applications/commands"
-	"github.com/n0en0o/marketplace/internal/promotion/applications/queries"
-	"github.com/n0en0o/marketplace/internal/promotion/domain"
-	"github.com/n0en0o/marketplace/internal/promotion/domain/repositories"
-	"github.com/n0en0o/marketplace/internal/promotion/grpc/pb"
+	"github.com/n0en0o/shop/internal/promotion/applications/commands"
+	"github.com/n0en0o/shop/internal/promotion/applications/queries"
+	"github.com/n0en0o/shop/internal/promotion/domain"
+	"github.com/n0en0o/shop/internal/promotion/domain/repositories"
+	"github.com/n0en0o/shop/internal/promotion/grpc/pb"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )

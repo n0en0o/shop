@@ -4,8 +4,8 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/n0en0o/marketplace/internal/catalog/domain/entities"
-	"github.com/n0en0o/marketplace/internal/catalog/domain/repositories"
+	"github.com/n0en0o/shop/internal/catalog/domain/entities"
+	"github.com/n0en0o/shop/internal/catalog/domain/repositories"
 )
 
 type categoryRepository struct {

@@ -5,7 +5,7 @@ import (
 	"errors"
 
 	"github.com/google/uuid"
-	"github.com/n0en0o/marketplace/internal/catalog/domain/repositories"
+	"github.com/n0en0o/shop/internal/catalog/domain/repositories"
 )
 
 type DeleteCatalogItemCommand struct {

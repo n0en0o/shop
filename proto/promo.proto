@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package = "github.com/n0en0o/marketplace/internal/promotion/grpc/pb";
+option go_package = "github.com/n0en0o/shop/internal/promotion/grpc/pb";
 
 package promotion;
 

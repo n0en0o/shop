@@ -2,7 +2,7 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/n0en0o/marketplace/internal/basket/api/handlers"
+	"github.com/n0en0o/shop/internal/basket/api/handlers"
 )
 
 func RegisterRoutes(

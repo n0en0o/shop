@@ -7,8 +7,8 @@ import (
 	"fmt"
 
 	"github.com/go-sql-driver/mysql"
-	"github.com/n0en0o/marketplace/internal/promotion/domain"
-	"github.com/n0en0o/marketplace/internal/promotion/domain/repositories"
+	"github.com/n0en0o/shop/internal/promotion/domain"
+	"github.com/n0en0o/shop/internal/promotion/domain/repositories"
 )
 
 const mysqlDuplicateEntryCode uint16 = 1062

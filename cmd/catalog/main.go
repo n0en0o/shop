@@ -14,13 +14,13 @@ import (
 	_ "github.com/lib/pq"
 
 	"github.com/gin-gonic/gin"
-	"github.com/n0en0o/marketplace/internal/catalog/api"
-	"github.com/n0en0o/marketplace/internal/catalog/api/handlers"
-	"github.com/n0en0o/marketplace/internal/catalog/applications/commands"
-	"github.com/n0en0o/marketplace/internal/catalog/applications/queries"
-	"github.com/n0en0o/marketplace/internal/catalog/config"
-	"github.com/n0en0o/marketplace/internal/catalog/infrastructure/persistence"
-	"github.com/n0en0o/marketplace/internal/shared"
+	"github.com/n0en0o/shop/internal/catalog/api"
+	"github.com/n0en0o/shop/internal/catalog/api/handlers"
+	"github.com/n0en0o/shop/internal/catalog/applications/commands"
+	"github.com/n0en0o/shop/internal/catalog/applications/queries"
+	"github.com/n0en0o/shop/internal/catalog/config"
+	"github.com/n0en0o/shop/internal/catalog/infrastructure/persistence"
+	"github.com/n0en0o/shop/internal/shared"
 )
 
 func main() {

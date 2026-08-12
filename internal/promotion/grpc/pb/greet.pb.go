@@ -223,7 +223,7 @@ const file_greet_proto_rawDesc = "" +
 	"\x06result\x18\x01 \x01(\x03R\x06result2h\n" +
 	"\aGreeter\x122\n" +
 	"\bSayHello\x12\x13.greet.HelloRequest\x1a\x11.greet.HelloReply\x12)\n" +
-	"\x03Add\x12\x11.greet.AddRequest\x1a\x0f.greet.AddReplyB:Z8github.com/n0en0o/marketplace/internal/promotion/grpc/pbb\x06proto3"
+	"\x03Add\x12\x11.greet.AddRequest\x1a\x0f.greet.AddReplyB3Z1github.com/n0en0o/shop/internal/promotion/grpc/pbb\x06proto3"
 
 var (
 	file_greet_proto_rawDescOnce sync.Once

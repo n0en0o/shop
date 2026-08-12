@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/n0en0o/marketplace/internal/catalog/applications/queries"
+	"github.com/n0en0o/shop/internal/catalog/applications/queries"
 )
 
 type BrandsHandler struct {

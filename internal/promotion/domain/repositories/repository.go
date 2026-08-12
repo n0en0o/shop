@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/n0en0o/marketplace/internal/promotion/domain"
+	"github.com/n0en0o/shop/internal/promotion/domain"
 )
 
 var ErrPromoNotFound = errors.New("акция не найдена")

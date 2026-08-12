@@ -3,7 +3,7 @@ package repositories
 import (
 	"context"
 
-	"github.com/n0en0o/marketplace/internal/basket/domain"
+	"github.com/n0en0o/shop/internal/basket/domain"
 )
 
 type CartRepository interface {

@@ -3,7 +3,7 @@ package commands
 import (
 	"context"
 
-	"github.com/n0en0o/marketplace/internal/promotion/domain/repositories"
+	"github.com/n0en0o/shop/internal/promotion/domain/repositories"
 )
 
 type DeletePromoCommand struct {

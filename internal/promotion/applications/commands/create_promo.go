@@ -6,8 +6,8 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
-	"github.com/n0en0o/marketplace/internal/promotion/domain"
-	"github.com/n0en0o/marketplace/internal/promotion/domain/repositories"
+	"github.com/n0en0o/shop/internal/promotion/domain"
+	"github.com/n0en0o/shop/internal/promotion/domain/repositories"
 )
 
 type CreatePromoCommand struct {

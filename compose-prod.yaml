@@ -1,6 +1,6 @@
-# docker compose -p marketplace-prod -f compose-prod.yaml down -v
-# docker-compose -p marketplace-prod -f compose-prod.yaml up -d
-# docker-compose -p marketplace-prod -f compose-prod.yaml up --build -d
+# docker compose -p shop-prod -f compose-prod.yaml down -v
+# docker-compose -p shop-prod -f compose-prod.yaml up -d
+# docker-compose -p shop-prod -f compose-prod.yaml up --build -d
 
 services:
   catalog-db-prod:
@@ -16,7 +16,7 @@ services:
     volumes:
       - postgres-catalog-prod:/var/lib/postgresql
     networks:
-      - marketplace-prod-net
+      - shop-prod-net
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
@@ -32,7 +32,7 @@ services:
     ports:
       - "9201:7001"
     networks:
-      - marketplace-prod-net
+      - shop-prod-net
     environment:
       - CATALOG_APP_PORT=7001
       - CATALOG_PG_HOST=catalog-db-prod
@@ -66,7 +66,7 @@ services:
     volumes:
       - postgres-basket-prod:/var/lib/postgresql/data
     networks:
-      - marketplace-prod-net
+      - shop-prod-net
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
@@ -89,7 +89,7 @@ services:
     volumes:
       - mysql_promotion_prod:/var/lib/mysql
     networks:
-      - marketplace-prod-net
+      - shop-prod-net
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p123456789"]
       interval: 10s
@@ -104,7 +104,7 @@ services:
     ports:
       - "9203:7003"
     networks:
-      - marketplace-prod-net
+      - shop-prod-net
     environment:
       - PROMOTION_DATABASE_URL=root:123456789@tcp(promotion_db_prod:3306)/promotion-db?parseTime=true&multiStatements=true
       - PROMOTION_MIGRATIONS_PATH=file:///app/migrations/promotion
@@ -128,7 +128,7 @@ services:
     ports:
       - "9202:7002"
     networks:
-      - marketplace-prod-net
+      - shop-prod-net
     environment:
       - BASKET_APP_PORT=7002
       - BASKET_DATABASE_URL=postgres://postgres:123456789@basket-db-prod:5432/basket-db-prod?sslmode=disable
@@ -163,7 +163,7 @@ services:
     volumes:
       - redis-basket-prod:/data 
     networks:
-      - marketplace-prod-net
+      - shop-prod-net
     healthcheck:
       test: ["CMD", "redis-cli", "-a", "123456789", "--raw", "incr", "ping"]
       interval: 10s
@@ -178,5 +178,5 @@ volumes:
   mysql_promotion_prod:
 
 networks:
-  marketplace-prod-net:
+  shop-prod-net:
     driver: bridge

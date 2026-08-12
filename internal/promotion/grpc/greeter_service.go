@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/n0en0o/marketplace/internal/promotion/grpc/pb"
+	"github.com/n0en0o/shop/internal/promotion/grpc/pb"
 )
 
 type GreeterService struct {

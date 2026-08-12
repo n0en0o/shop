@@ -3,8 +3,8 @@ package queries
 import (
 	"context"
 
-	"github.com/n0en0o/marketplace/internal/catalog/domain/entities"
-	"github.com/n0en0o/marketplace/internal/catalog/domain/repositories"
+	"github.com/n0en0o/shop/internal/catalog/domain/entities"
+	"github.com/n0en0o/shop/internal/catalog/domain/repositories"
 )
 
 type CategoriesHandler struct {

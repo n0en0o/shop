@@ -6,9 +6,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/n0en0o/marketplace/internal/catalog/applications/commands"
-	"github.com/n0en0o/marketplace/internal/catalog/applications/queries"
-	"github.com/n0en0o/marketplace/internal/catalog/domain/repositories"
+	"github.com/n0en0o/shop/internal/catalog/applications/commands"
+	"github.com/n0en0o/shop/internal/catalog/applications/queries"
+	"github.com/n0en0o/shop/internal/catalog/domain/repositories"
 )
 
 type CatalogItemsHandler struct {

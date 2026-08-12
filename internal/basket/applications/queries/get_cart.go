@@ -3,8 +3,8 @@ package queries
 import (
 	"context"
 
-	"github.com/n0en0o/marketplace/internal/basket/domain"
-	"github.com/n0en0o/marketplace/internal/basket/domain/repositories"
+	"github.com/n0en0o/shop/internal/basket/domain"
+	"github.com/n0en0o/shop/internal/basket/domain/repositories"
 )
 
 type GetCartHandler struct {
