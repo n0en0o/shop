@@ -124,7 +124,7 @@ func runGRPCServer(ctx context.Context, port string, db *sql.DB) error {
 
 	go func() {
 		<-ctx.Done()
-		log.Println("shutdown signal received, stopped gRPC server...")
+		log.Println("shutdown signal received, stopping gRPC server...")
 
 		timer := time.AfterFunc(10*time.Second, func() {
 			log.Println("timeout exceeded, server stop")
