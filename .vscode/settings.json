@@ -1,7 +1,9 @@
 {
     "cSpell.language": "en,ru,ru-RU",
     "cSpell.words": [
+        "godotenv",
         "gonic",
+        "joho",
         "promotiongrpc",
         "promotionpb",
         "SSLMODE"
