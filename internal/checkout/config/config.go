@@ -10,11 +10,13 @@ import (
 )
 
 type Config struct {
+	AppPort        string
 	DatabaseURL    string
 	MigrationsPath string
 }
 
 const (
+	defaultAppPort        = "9004"
 	defaultDatabaseURL    = "postgres://postgres:123456789@localhost:9104/checkout-db-dev?sslmode=disable"
 	defaultMigrationsPath = "file://migrations/checkout"
 )
@@ -23,6 +25,7 @@ func Load() (Config, error) {
 	loadDotEnv()
 
 	cfg := Config{
+		AppPort:        getEnv("CHECKOUT_APP_PORT", defaultAppPort),
 		DatabaseURL:    getEnv("CHECKOUT_DATABASE_URL", defaultDatabaseURL),
 		MigrationsPath: resolveMigrationsPath(getEnv("CHECKOUT_MIGRATIONS_PATH", defaultMigrationsPath)),
 	}
@@ -42,6 +45,9 @@ func (c Config) Validate() error {
 	}
 	if strings.TrimSpace(c.MigrationsPath) == "" {
 		missing = append(missing, "CHECKOUT_MIGRATIONS_PATH")
+	}
+	if strings.TrimSpace(c.AppPort) == "" {
+		missing = append(missing, "CHECKOUT_APP_PORT")
 	}
 
 	if len(missing) > 0 {

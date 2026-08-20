@@ -5,8 +5,10 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"net/http"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
@@ -32,6 +34,17 @@ func main() {
 		log.Fatalf("runMigrations: %v", err)
 	}
 	log.Println("checkout migrations completed successfully")
+
+	r := gin.Default()
+
+	r.GET("/health", func(ctx *gin.Context) {
+		ctx.JSON(http.StatusOK, gin.H{"status": "ok"})
+	})
+
+	log.Printf("starting checkout server on port: %s\n", cfg.AppPort)
+	if err := r.Run(":" + cfg.AppPort); err != nil {
+		log.Fatal(err)
+	}
 }
 
 func openDB(dsn string) (*sql.DB, error) {
