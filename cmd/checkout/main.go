@@ -13,7 +13,11 @@ import (
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/lib/pq"
+	"github.com/n0en0o/shop/internal/checkout/api"
+	"github.com/n0en0o/shop/internal/checkout/api/handlers"
+	"github.com/n0en0o/shop/internal/checkout/applications/queries"
 	"github.com/n0en0o/shop/internal/checkout/config"
+	"github.com/n0en0o/shop/internal/checkout/infrastructure/persistence"
 	"github.com/n0en0o/shop/internal/shared"
 )
 
@@ -35,11 +39,22 @@ func main() {
 	}
 	log.Println("checkout migrations completed successfully")
 
+	repo := persistence.NewOrderRepository(db)
+	orderByIDHandler := queries.NewOrderByIDQueryHandler(repo)
+	ordersByAccountNameHandler := queries.NewOrdersByAccountNameQueryHandler(repo)
+
+	orderHandler := handlers.NewOrderHandler(
+		orderByIDHandler,
+		ordersByAccountNameHandler,
+	)
+
 	r := gin.Default()
 
 	r.GET("/health", func(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, gin.H{"status": "ok"})
 	})
+
+	api.RegisterRoutes(r, orderHandler)
 
 	log.Printf("starting checkout server on port: %s\n", cfg.AppPort)
 	if err := r.Run(":" + cfg.AppPort); err != nil {
