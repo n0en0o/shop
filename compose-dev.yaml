@@ -97,12 +97,35 @@ services:
       retries: 5
       start_period: 30s
 
+  rabbit_mq_dev:
+    container_name: rabbit-mq-dev
+    hostname: marketplace-mq
+    image: rabbitmq:3-management
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data_dev:/var/lib/rabbitmq
+    networks:
+      - shop-dev-net
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 30s
+
 volumes:
   postgres-catalog-dev:
   postgres-basket-dev:
   redis-basket-dev:
   mysql-promotion:
   postgres_checkout_dev:
+  rabbitmq_data_dev:
 
 networks:
   shop-dev-net:

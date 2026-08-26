@@ -3,9 +3,13 @@
     "cSpell.words": [
         "godotenv",
         "gonic",
+        "healthcheck",
+        "isready",
         "joho",
+        "mysqladmin",
         "promotiongrpc",
         "promotionpb",
+        "requirepass",
         "SSLMODE"
     ]
 }

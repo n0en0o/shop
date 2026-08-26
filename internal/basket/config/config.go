@@ -16,6 +16,10 @@ type Config struct {
 	RedisPassword  string
 	PromotionHost  string
 	PromotionPort  string
+	RabbitMQHost   string
+	RabbitMQPort   string
+	RabbitMQUser   string
+	RabbitMQPass   string
 }
 
 func Load() (Config, error) {
@@ -29,6 +33,10 @@ func Load() (Config, error) {
 		RedisPassword:  getEnv("BASKET_REDIS_PASSWORD", ""),
 		PromotionHost:  getEnv("BASKET_PROMOTION_HOST", ""),
 		PromotionPort:  getEnv("BASKET_PROMOTION_PORT", ""),
+		RabbitMQHost:   getEnv("BASKET_RABBITMQ_HOST", ""),
+		RabbitMQPort:   getEnv("BASKET_RABBITMQ_PORT", ""),
+		RabbitMQUser:   getEnv("BASKET_RABBITMQ_USER", ""),
+		RabbitMQPass:   getEnv("BASKET_RABBITMQ_PASSWORD", ""),
 	}
 
 	if err := cfg.Validate(); err != nil {
@@ -58,6 +66,18 @@ func (c Config) Validate() error {
 	}
 	if strings.TrimSpace(c.PromotionPort) == "" {
 		missing = append(missing, "BASKET_PROMOTION_PORT")
+	}
+	if strings.TrimSpace(c.RabbitMQHost) == "" {
+		missing = append(missing, "BASKET_RABBITMQ_HOST")
+	}
+	if strings.TrimSpace(c.RabbitMQPort) == "" {
+		missing = append(missing, "BASKET_RABBITMQ_PORT")
+	}
+	if strings.TrimSpace(c.RabbitMQUser) == "" {
+		missing = append(missing, "BASKET_RABBITMQ_USER")
+	}
+	if strings.TrimSpace(c.RabbitMQPass) == "" {
+		missing = append(missing, "BASKET_RABBITMQ_PASSWORD")
 	}
 
 	if len(missing) > 0 {

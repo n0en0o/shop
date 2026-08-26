@@ -3,6 +3,9 @@ package handlers
 import (
 	"fmt"
 	"net/http"
+	"strings"
+
+	"github.com/google/uuid"
 
 	"github.com/gin-gonic/gin"
 	"github.com/n0en0o/shop/internal/basket/applications/commands"
@@ -11,20 +14,23 @@ import (
 )
 
 type CartHandler struct {
-	saveCart   *commands.SaveCartHandler
-	getCart    *queries.GetCartHandler
-	removeCart *commands.RemoveCartHandler
+	saveCart     *commands.SaveCartHandler
+	getCart      *queries.GetCartHandler
+	removeCart   *commands.RemoveCartHandler
+	checkoutCart *commands.CheckoutCartHandler
 }
 
 func NewCartHandler(
 	saveCart *commands.SaveCartHandler,
 	getCart *queries.GetCartHandler,
 	removeCart *commands.RemoveCartHandler,
+	checkoutCart *commands.CheckoutCartHandler,
 ) *CartHandler {
 	return &CartHandler{
-		saveCart:   saveCart,
-		getCart:    getCart,
-		removeCart: removeCart,
+		saveCart:     saveCart,
+		getCart:      getCart,
+		removeCart:   removeCart,
+		checkoutCart: checkoutCart,
 	}
 }
 
@@ -81,4 +87,62 @@ func (h *CartHandler) RemoveCart(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"success": success,
 	})
+}
+
+func (h *CartHandler) CheckoutCart(c *gin.Context) {
+	var req commands.CheckoutCartRequest
+
+	if err := c.ShouldBindBodyWithJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	correlationID := uuid.New().String()
+
+	cmd := commands.CheckoutCartCommand{
+		CheckoutCartRequest: req,
+		CorrelationID:       correlationID,
+	}
+
+	result, err := h.checkoutCart.Handle(c.Request.Context(), cmd)
+
+	if err != nil {
+		if isValidationError(err) {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+		if strings.Contains(err.Error(), "не найдена") ||
+			strings.Contains(err.Error(), "not found") {
+			c.JSON(http.StatusNotFound, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	response := commands.CheckoutCartResponse{
+		OrderID:       result.OrderID,
+		CorrelationID: result.CorrelationID,
+		Message:       "Корзина успешно оформлена",
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"result": response,
+	})
+
+}
+
+func isValidationError(err error) bool {
+	errStr := err.Error()
+	return strings.Contains(errStr, "validate") ||
+		strings.Contains(errStr, "required") ||
+		strings.Contains(errStr, "обязателен")
 }

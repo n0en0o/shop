@@ -25,6 +25,7 @@ import (
 	"github.com/n0en0o/shop/internal/basket/infrastructure/persistence"
 	promotionpb "github.com/n0en0o/shop/internal/promotion/grpc/pb"
 	"github.com/n0en0o/shop/internal/shared"
+	"github.com/n0en0o/shop/internal/shared/messaging"
 	"github.com/redis/go-redis/v9"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -93,6 +94,23 @@ func main() {
 		promoClient = promotionpb.NewPromotionServiceClient(grpcConn)
 	}
 
+	rabbitConfig := messaging.RabbitMQConfig{
+		Host:     cfg.RabbitMQHost,
+		Port:     cfg.RabbitMQPort,
+		Username: cfg.RabbitMQUser,
+		Password: cfg.RabbitMQPass,
+	}
+
+	publisher, err := messaging.NewRabbitMQPublisher(rabbitConfig)
+	if err != nil {
+		log.Printf("warning: failed to connect to RabbitMQ: %v", err)
+	} else {
+		defer publisher.Close()
+		if err := publisher.SetupOrderEventsExchange(); err != nil {
+			log.Printf("warning: failed to setup order events exchange: %v", err)
+		}
+	}
+
 	pgRepo := persistence.NewCartRepository(db)
 	var repo repositories.CartRepository = cache.NewRedisCartRepository(
 		pgRepo,
@@ -102,11 +120,13 @@ func main() {
 	saveCartHandler := commands.NewSaveCartHandler(repo, promoClient)
 	getCartHandler := queries.NewGetCartHandler(repo)
 	removeCartHandler := commands.NewRemoveCartHandler(repo)
+	checkoutCartHandler := commands.NewCheckoutCartHandler(repo, publisher)
 
 	cartHandler := handlers.NewCartHandler(
 		saveCartHandler,
 		getCartHandler,
 		removeCartHandler,
+		checkoutCartHandler,
 	)
 
 	r := gin.Default()
