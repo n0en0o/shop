@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/joho/godotenv"
@@ -28,7 +29,7 @@ func Load() (Config, error) {
 	cfg := Config{
 		AppPort:        getEnv("BASKET_APP_PORT", "9002"),
 		DatabaseURL:    getEnv("BASKET_DATABASE_URL", ""),
-		MigrationsPath: getEnv("BASKET_MIGRATIONS_PATH", ""),
+		MigrationsPath: resolveMigrationsPath(getEnv("BASKET_MIGRATIONS_PATH", "")),
 		RedisURL:       getEnv("BASKET_REDIS_URL", ""),
 		RedisPassword:  getEnv("BASKET_REDIS_PASSWORD", ""),
 		PromotionHost:  getEnv("BASKET_PROMOTION_HOST", ""),
@@ -103,4 +104,29 @@ func loadDotEnv() {
 			return
 		}
 	}
+}
+
+func resolveMigrationsPath(value string) string {
+	const fileScheme = "file://"
+
+	if !strings.HasPrefix(value, fileScheme) {
+		return value
+	}
+
+	path := strings.TrimPrefix(value, fileScheme)
+	if pathExists(path) || filepath.IsAbs(path) {
+		return value
+	}
+
+	fallbackPath := filepath.Clean(filepath.Join("..", "..", path))
+	if pathExists(fallbackPath) {
+		return fileScheme + filepath.ToSlash(fallbackPath)
+	}
+
+	return value
+}
+
+func pathExists(path string) bool {
+	_, err := os.Stat(path)
+	return err == nil
 }

@@ -10,7 +10,7 @@ func RegisterRoutes(r *gin.Engine, orderHandler *handlers.OrderHandler) {
 	{
 		orders := v1.Group("/orders")
 		{
-			orders.GET("/account/:accountName", orderHandler.OrdersByAccountName)
+			orders.GET("/account/:name", orderHandler.OrdersByAccountName)
 			orders.GET("/:id", orderHandler.Order)
 		}
 	}

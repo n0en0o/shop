@@ -138,12 +138,19 @@ services:
       # gRPC Promotion service
       - BASKET_PROMOTION_HOST=promotion-grpc
       - BASKET_PROMOTION_PORT=7003
+      # RabbitMQ
+      - BASKET_RABBITMQ_HOST=rabbit_mq_prod
+      - BASKET_RABBITMQ_PORT=5672
+      - BASKET_RABBITMQ_USER=guest
+      - BASKET_RABBITMQ_PASSWORD=guest
     depends_on:
       basket-db-prod:
         condition: service_healthy
       basket-cache-redis-prod:
         condition: service_healthy
       promotion-grpc:
+        condition: service_healthy
+      rabbit_mq_prod:
         condition: service_healthy
     restart: unless-stopped
     healthcheck:
@@ -171,11 +178,89 @@ services:
       retries: 5
       start_period: 20s
 
+  # RabbitMQ
+  rabbit_mq_prod:
+    container_name: rabbit-mq-prod
+    hostname: marketplace-mq
+    image: rabbitmq:3-management
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    restart: always
+    ports:
+      - "9322:5672"
+      - "15673:15672"
+    volumes:
+      - rabbitmq_data_prod:/var/lib/rabbitmq
+    networks:
+      - shop-prod-net
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 30s
+
+  # Checkout services (PostgreSQL + API)
+  checkout_db_prod:
+    container_name: checkout-db-prod
+    image: postgres:18.1
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=123456789
+      - POSTGRES_DB=checkout-db-prod
+    restart: always
+    ports:
+      - "9304:5432"
+    volumes:
+      - postgres_checkout_prod:/var/lib/postgresql
+    networks:
+      - shop-prod-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  checkout_api:
+    container_name: checkout-api
+    build:
+      context: .
+      dockerfile: cmd/checkout/Dockerfile
+    ports:
+      - "9204:7004"
+    networks:
+      - shop-prod-net
+    environment:
+      - CHECKOUT_APP_PORT=7004
+      - CHECKOUT_DATABASE_URL=postgres://postgres:123456789@checkout_db_prod:5432/checkout-db-prod?sslmode=disable
+      - CHECKOUT_MIGRATIONS_PATH=file:///app/migrations/checkout
+      # RabbitMQ
+      - CHECKOUT_RABBITMQ_HOST=rabbit_mq_prod
+      - CHECKOUT_RABBITMQ_PORT=5672
+      - CHECKOUT_RABBITMQ_USER=guest
+      - CHECKOUT_RABBITMQ_PASSWORD=guest
+    depends_on:
+      checkout_db_prod:
+        condition: service_healthy
+      rabbit_mq_prod:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost:7004/health || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 40s
+
 volumes:
   postgres-catalog-prod:
   postgres-basket-prod:
   redis-basket-prod:
   mysql_promotion_prod:
+  rabbitmq_data_prod:
+  postgres_checkout_prod:
 
 networks:
   shop-prod-net:

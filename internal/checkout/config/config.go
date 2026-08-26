@@ -10,24 +10,36 @@ import (
 )
 
 type Config struct {
-	AppPort        string
-	DatabaseURL    string
-	MigrationsPath string
+	AppPort          string
+	DatabaseURL      string
+	MigrationsPath   string
+	RabbitMQHost     string
+	RabbitMQPort     string
+	RabbitMQUser     string
+	RabbitMQPassword string
 }
 
 const (
-	defaultAppPort        = "9004"
-	defaultDatabaseURL    = "postgres://postgres:123456789@localhost:9104/checkout-db-dev?sslmode=disable"
-	defaultMigrationsPath = "file://migrations/checkout"
+	defaultAppPort          = "9004"
+	defaultDatabaseURL      = "postgres://postgres:123456789@localhost:9104/checkout-db-dev?sslmode=disable"
+	defaultMigrationsPath   = "file://migrations/checkout"
+	defaultRabbitMQHost     = "localhost"
+	defaultRabbitMQPort     = "5672"
+	defaultRabbitMQUser     = "guest"
+	defaultRabbitMQPassword = "guest"
 )
 
 func Load() (Config, error) {
 	loadDotEnv()
 
 	cfg := Config{
-		AppPort:        getEnv("CHECKOUT_APP_PORT", defaultAppPort),
-		DatabaseURL:    getEnv("CHECKOUT_DATABASE_URL", defaultDatabaseURL),
-		MigrationsPath: resolveMigrationsPath(getEnv("CHECKOUT_MIGRATIONS_PATH", defaultMigrationsPath)),
+		AppPort:          getEnv("CHECKOUT_APP_PORT", defaultAppPort),
+		DatabaseURL:      getEnv("CHECKOUT_DATABASE_URL", defaultDatabaseURL),
+		MigrationsPath:   resolveMigrationsPath(getEnv("CHECKOUT_MIGRATIONS_PATH", defaultMigrationsPath)),
+		RabbitMQHost:     getEnv("CHECKOUT_RABBITMQ_HOST", defaultRabbitMQHost),
+		RabbitMQPort:     getEnv("CHECKOUT_RABBITMQ_PORT", defaultRabbitMQPort),
+		RabbitMQUser:     getEnv("CHECKOUT_RABBITMQ_USER", defaultRabbitMQUser),
+		RabbitMQPassword: getEnv("CHECKOUT_RABBITMQ_PASSWORD", defaultRabbitMQPassword),
 	}
 
 	if err := cfg.Validate(); err != nil {
@@ -48,6 +60,18 @@ func (c Config) Validate() error {
 	}
 	if strings.TrimSpace(c.AppPort) == "" {
 		missing = append(missing, "CHECKOUT_APP_PORT")
+	}
+	if strings.TrimSpace(c.RabbitMQHost) == "" {
+		missing = append(missing, "CHECKOUT_RABBITMQ_HOST")
+	}
+	if strings.TrimSpace(c.RabbitMQPort) == "" {
+		missing = append(missing, "CHECKOUT_RABBITMQ_PORT")
+	}
+	if strings.TrimSpace(c.RabbitMQUser) == "" {
+		missing = append(missing, "CHECKOUT_RABBITMQ_USER")
+	}
+	if strings.TrimSpace(c.RabbitMQPassword) == "" {
+		missing = append(missing, "CHECKOUT_RABBITMQ_PASSWORD")
 	}
 
 	if len(missing) > 0 {

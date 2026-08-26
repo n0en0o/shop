@@ -1,11 +1,15 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -15,10 +19,13 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/n0en0o/shop/internal/checkout/api"
 	"github.com/n0en0o/shop/internal/checkout/api/handlers"
+	"github.com/n0en0o/shop/internal/checkout/applications/commands"
 	"github.com/n0en0o/shop/internal/checkout/applications/queries"
 	"github.com/n0en0o/shop/internal/checkout/config"
 	"github.com/n0en0o/shop/internal/checkout/infrastructure/persistence"
+	checkoutMsg "github.com/n0en0o/shop/internal/checkout/messaging"
 	"github.com/n0en0o/shop/internal/shared"
+	sharedMsg "github.com/n0en0o/shop/internal/shared/messaging"
 )
 
 func main() {
@@ -39,14 +46,60 @@ func main() {
 	}
 	log.Println("checkout migrations completed successfully")
 
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+	defer signal.Stop(sigChan)
+
 	repo := persistence.NewOrderRepository(db)
 	orderByIDHandler := queries.NewOrderByIDQueryHandler(repo)
 	ordersByAccountNameHandler := queries.NewOrdersByAccountNameQueryHandler(repo)
+	processOrderHandler := commands.NewProcessOrderSubmissionHandler(repo)
 
 	orderHandler := handlers.NewOrderHandler(
 		orderByIDHandler,
 		ordersByAccountNameHandler,
 	)
+
+	rabbitConfig := sharedMsg.RabbitMQConfig{
+		Host:     cfg.RabbitMQHost,
+		Port:     cfg.RabbitMQPort,
+		Username: cfg.RabbitMQUser,
+		Password: cfg.RabbitMQPassword,
+	}
+
+	consumer, err := sharedMsg.NewRabbitMQConsumer(rabbitConfig)
+	if err != nil {
+		log.Printf("unable to connect to RabbitMQ: %v", err)
+		log.Print("service will start without consumer")
+	} else {
+		defer consumer.Close()
+
+		err := consumer.SetupQueue(
+			sharedMsg.OrderSubmittedExchange,
+			"direct",
+			sharedMsg.OrderSubmittedQueue,
+			sharedMsg.OrderSubmittedEventType,
+		)
+		if err != nil {
+			log.Printf("queue configuration error: %v", err)
+		} else {
+			orderConsumer := checkoutMsg.NewOrderSubmittedConsumer(processOrderHandler)
+			go func() {
+				log.Print("launch consumer for OrderSubmittedEvent...")
+				err := consumer.Consume(
+					ctx,
+					sharedMsg.OrderSubmittedQueue,
+					orderConsumer.HandleMessage,
+				)
+				if err != nil && !errors.Is(err, context.Canceled) {
+					log.Printf("consumer stopped: %v", err)
+				}
+			}()
+		}
+	}
 
 	r := gin.Default()
 
@@ -56,8 +109,35 @@ func main() {
 
 	api.RegisterRoutes(r, orderHandler)
 
-	log.Printf("starting checkout server on port: %s\n", cfg.AppPort)
-	if err := r.Run(":" + cfg.AppPort); err != nil {
+	server := &http.Server{
+		Addr:    ":" + cfg.AppPort,
+		Handler: r,
+	}
+
+	serverErr := make(chan error, 1)
+	go func() {
+		log.Printf("starting checkout server on port: %s\n", cfg.AppPort)
+		serverErr <- server.ListenAndServe()
+	}()
+
+	select {
+	case <-sigChan:
+		log.Print("services stopped...")
+		cancel()
+
+		shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer shutdownCancel()
+		if err := server.Shutdown(shutdownCtx); err != nil {
+			log.Printf("checkout server shutdown error: %v", err)
+		}
+	case err := <-serverErr:
+		if err != nil && !errors.Is(err, http.ErrServerClosed) {
+			log.Fatal(err)
+		}
+		return
+	}
+
+	if err := <-serverErr; err != nil && !errors.Is(err, http.ErrServerClosed) {
 		log.Fatal(err)
 	}
 }
