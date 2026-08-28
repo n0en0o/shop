@@ -325,6 +325,42 @@ services:
     command: ["run", "/scripts/catalog-test.js"]
     restart: "no"
 
+  # k6: gRPC load testing
+  k6-grpc:
+    container_name: k6-grpc-load-test
+    image: grafana/k6:latest
+    volumes:
+      - ./infrastructure/k6:/scripts:ro
+      - ./proto:/proto:ro
+    environment:
+      - GRPC_TARGET=promotion-grpc:7003
+    networks:
+      - shop-prod-net
+    depends_on:
+      promotion-grpc:
+        condition: service_healthy
+    command: ["run", "/scripts/promotion-grpc-test.js"]
+    restart: "no"
+
+  # Portainer: container management
+  portainer:
+    container_name: portainer
+    image: portainer/portainer-ce:latest
+    restart: always
+    ports:
+      - "9000:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    networks:
+      - shop-prod-net
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost:9000/api/system/status || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
 volumes:
   postgres-catalog-prod:
   postgres-basket-prod:
@@ -334,6 +370,7 @@ volumes:
   postgres_checkout_prod:
   prometheus_data:
   grafana_data:
+  portainer_data:
 
 networks:
   shop-prod-net:
