@@ -103,12 +103,14 @@ services:
       dockerfile: cmd/promotion/DockerFile
     ports:
       - "9203:7003"
+      - "9213:7013"
     networks:
       - shop-prod-net
     environment:
       - PROMOTION_DATABASE_URL=root:123456789@tcp(promotion_db_prod:3306)/promotion-db?parseTime=true&multiStatements=true
       - PROMOTION_MIGRATIONS_PATH=file:///app/migrations/promotion
       - PROMOTION_GRPC_PORT=7003
+      - PROMOTION_METRICS_PORT=7013
     depends_on:
       promotion_db_prod:
         condition: service_healthy

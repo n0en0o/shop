@@ -5,6 +5,7 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"runtime"
 	"time"
 
 	"github.com/golang-migrate/migrate/v4"
@@ -21,6 +22,7 @@ import (
 	"github.com/n0en0o/shop/internal/catalog/config"
 	"github.com/n0en0o/shop/internal/catalog/infrastructure/persistence"
 	"github.com/n0en0o/shop/internal/shared"
+	"github.com/n0en0o/shop/internal/shared/metrics"
 )
 
 func main() {
@@ -83,7 +85,12 @@ func main() {
 	listItemsV2 := queries.NewCatalogItemsV2Handler(itemRepo)
 	itemsHandlerV2 := handlers.NewCatalogItemsHandlerV2(listItemsV2)
 
+	const serviceName = "catalog"
+	metrics.AppInfo.WithLabelValues(serviceName, "1.0.0", runtime.Version()).Set(1)
+
 	r := gin.Default()
+	r.Use(metrics.GinMetricsMiddleware(serviceName))
+	metrics.RegisterMetricsEndpoint(r)
 
 	r.GET("/health", func(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, gin.H{"status": "ok"})

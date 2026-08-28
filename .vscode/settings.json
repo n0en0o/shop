@@ -7,6 +7,8 @@
         "isready",
         "joho",
         "mysqladmin",
+        "promauto",
+        "promhttp",
         "promotiongrpc",
         "promotionpb",
         "requirepass",
