@@ -1,0 +1,25 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+  external_labels:
+    environment: 'production'
+    project: 'marketplace-go'
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+    metrics_path: /metrics
+
+  - job_name: 'catalog-api'
+    static_configs:
+      - targets: ['catalog-api:7001']
+    metrics_path: /metrics
+    scrape_interval: 5s
+
+  - job_name: 'promotion-grpc'
+    static_configs:
+      - targets: ['promotion-grpc:7013']
+    metrics_path: /metrics
+    scrape_interval: 5s

@@ -9,5 +9,5 @@ FROM alpine:3.20 AS final
 WORKDIR /app
 COPY --from=build /app/promotion .
 COPY migrations/promotion ./migrations/promotion
-EXPOSE 9003 9013
+EXPOSE 7003 7013
 ENTRYPOINT ["./promotion"]

@@ -10,6 +10,7 @@ import (
 
 type Config struct {
 	AppPort        string
+	MetricsPort    string
 	Postgres       PostgresConfig
 	MigrationsPath string
 }
@@ -27,7 +28,8 @@ func Load() (Config, error) {
 	loadDotEnv()
 
 	cfg := Config{
-		AppPort: getEnv("CATALOG_APP_PORT", "9001"),
+		AppPort:     getEnv("CATALOG_APP_PORT", "9001"),
+		MetricsPort: getEnv("CATALOG_METRICS_PORT", "9011"),
 		Postgres: PostgresConfig{
 			Host:     getEnv("CATALOG_PG_HOST", "localhost"),
 			Port:     getEnv("CATALOG_PG_PORT", "9101"),

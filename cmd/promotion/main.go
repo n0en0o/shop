@@ -7,8 +7,10 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"net/http"
 	"os"
 	"os/signal"
+	"runtime"
 	"syscall"
 	"time"
 
@@ -23,6 +25,8 @@ import (
 	"github.com/n0en0o/shop/internal/promotion/grpc/pb"
 	"github.com/n0en0o/shop/internal/promotion/infrastructure/persistence"
 	"github.com/n0en0o/shop/internal/shared"
+	"github.com/n0en0o/shop/internal/shared/metrics"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
@@ -50,7 +54,20 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
-	if err := runGRPCServer(ctx, cfg.GRPCPort, db); err != nil {
+	const serviceName = "promotion"
+	metrics.AppInfo.WithLabelValues(serviceName, "1.0.0", runtime.Version()).Set(1)
+
+	go func() {
+		mux := http.NewServeMux()
+		mux.Handle("/metrics", promhttp.Handler())
+
+		log.Printf("metrics server listening on: %s", cfg.MetricsPort)
+		if err := http.ListenAndServe(":"+cfg.MetricsPort, mux); err != nil {
+			log.Fatalf("metrics server error: %v", err)
+		}
+	}()
+
+	if err := runGRPCServer(ctx, cfg.GRPCPort, db, serviceName); err != nil {
 		log.Fatalf("runGRPCServer: %v", err)
 	}
 }
@@ -92,13 +109,16 @@ func runMigrations(migrationDB *sql.DB, migrationsPath string) error {
 	return nil
 }
 
-func runGRPCServer(ctx context.Context, port string, db *sql.DB) error {
+func runGRPCServer(ctx context.Context, port string, db *sql.DB, serviceName string) error {
 	lis, err := net.Listen("tcp", ":"+port)
 	if err != nil {
 		return fmt.Errorf("net.Listen: %w", err)
 	}
 
-	grpcServer := grpc.NewServer()
+	grpcServer := grpc.NewServer(
+		grpc.UnaryInterceptor(metrics.GRPCUnaryServerInterceptor(serviceName)),
+		grpc.StreamInterceptor(metrics.GRPCStreamServerInterceptor(serviceName)),
+	)
 	greeterService := promotiongrpc.NewGreeterService()
 
 	repo := persistence.NewPromoRepository(db)

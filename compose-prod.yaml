@@ -35,6 +35,7 @@ services:
       - shop-prod-net
     environment:
       - CATALOG_APP_PORT=7001
+      - CATALOG_METRICS_PORT=7011
       - CATALOG_PG_HOST=catalog-db-prod
       - CATALOG_PG_PORT=5432
       - CATALOG_PG_DATABASE=catalog-db-prod
@@ -256,6 +257,74 @@ services:
       retries: 10
       start_period: 40s
 
+  # Infrastructure: monitoring and management
+  prometheus:
+    container_name: prometheus-prod
+    image: prom/prometheus:v3.10.0
+    restart: always
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./infrastructure/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/etc/prometheus/console_libraries"
+      - "--web.console.templates=/etc/prometheus/consoles"
+      - "--web.enable-lifecycle"
+    networks:
+      - shop-prod-net
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost:9090/-/healthy || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  # Grafana: metrics visualization
+  grafana:
+    container_name: grafana-prod
+    image: grafana/grafana:12.3.4
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./infrastructure/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+      - ./infrastructure/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+    networks:
+      - shop-prod-net
+    depends_on:
+      prometheus:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost:3000/api/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # k6: load testing
+  k6:
+    container_name: k6-load-test
+    image: grafana/k6:latest
+    volumes:
+      - ./infrastructure/k6:/scripts:ro
+    environment:
+      - TARGET_URL=http://catalog-api:7001
+    networks:
+      - shop-prod-net
+    depends_on:
+      catalog-api:
+        condition: service_healthy
+    command: ["run", "/scripts/catalog-test.js"]
+    restart: "no"
+
 volumes:
   postgres-catalog-prod:
   postgres-basket-prod:
@@ -263,6 +332,8 @@ volumes:
   mysql_promotion_prod:
   rabbitmq_data_prod:
   postgres_checkout_prod:
+  prometheus_data:
+  grafana_data:
 
 networks:
   shop-prod-net:
